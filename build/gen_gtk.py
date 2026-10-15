@@ -172,6 +172,8 @@ headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover, windowco
 headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover, windowcontrols button.close:hover {{
   background-color: {ALERT}; box-shadow: none; color: #ffffff; }}
 headerbar button.titlebutton:backdrop, windowcontrols button:backdrop {{ color: {FAINT}; }}
+windowcontrols button > image, headerbar button.titlebutton > image {{
+  background: none; background-color: transparent; border-radius: 0; box-shadow: none; color: inherit; }}
 scrollbar slider:hover {{ background: {a}; }}
 """
 
