@@ -36,7 +36,8 @@ Item {
             Shape {
                 id: ring
                 anchors.fill: parent
-                preferredRendererType: Shape.CurveRenderer
+                // smoother curve renderer where available (Qt 6.6+); older Qt keeps the default
+                Component.onCompleted: if (typeof preferredRendererType !== "undefined") preferredRendererType = 4
                 ShapePath {
                     strokeColor: Qt.rgba(s.accent.r, s.accent.g, s.accent.b, modelData.o)
                     strokeWidth: modelData.w; fillColor: "transparent"; capStyle: ShapePath.FlatCap

@@ -40,7 +40,8 @@ Item {
                 GradientStop { position: 0.55; color: "#0a0e13" }
                 GradientStop { position: 1.0; color: "#06080b" }
             }
-            PathRectangle { x: 0; y: 0; width: root.width; height: root.height }
+            // a plain rectangle; PathRectangle would need Qt 6.8 (Mint 22 has 6.4)
+            PathPolyline { path: [Qt.point(0, 0), Qt.point(root.width, 0), Qt.point(root.width, root.height), Qt.point(0, root.height), Qt.point(0, 0)] }
         }
     }
     Image {
@@ -99,7 +100,8 @@ Item {
                 GradientStop { position: 0.6; color: "transparent" }
                 GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.6) }
             }
-            PathRectangle { x: 0; y: 0; width: root.width; height: root.height }
+            // a plain rectangle; PathRectangle would need Qt 6.8 (Mint 22 has 6.4)
+            PathPolyline { path: [Qt.point(0, 0), Qt.point(root.width, 0), Qt.point(root.width, root.height), Qt.point(0, root.height), Qt.point(0, 0)] }
         }
     }
     Shape {

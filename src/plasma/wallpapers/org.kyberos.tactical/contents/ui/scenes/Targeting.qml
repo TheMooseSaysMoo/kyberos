@@ -29,7 +29,8 @@ Item {
     // static trench walls
     Shape {
         anchors.fill: parent
-        preferredRendererType: Shape.CurveRenderer
+        // smoother curve renderer where available (Qt 6.6+); older Qt keeps the default
+        Component.onCompleted: if (typeof preferredRendererType !== "undefined") preferredRendererType = 4
         ShapePath {
             strokeColor: Qt.rgba(s.accent.r, s.accent.g, s.accent.b, 0.85)
             strokeWidth: Math.max(1.5, s.u * 0.002)
