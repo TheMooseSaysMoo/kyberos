@@ -1,9 +1,13 @@
 {
     "KPackageStructure": "Plasma/Applet",
     "KPlugin": {
-        "Authors": [{ "Name": "KyberOS" }],
+        "Authors": [
+            {
+                "Name": "KyberOS"
+            }
+        ],
         "Category": "System Information",
-        "Description": "Ship diagnostics: reactor (CPU), shields (memory), targeting (GPU), hull temperature and comms",
+        "Description": "Ship diagnostics console: CPU, RAM, GPU, disk, CPU temperature, per-core load, network and disk I/O",
         "Icon": "kyberos",
         "Id": "org.kyberos.diagnostics",
         "License": "GPL-3.0-or-later",

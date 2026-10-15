@@ -21,6 +21,9 @@ PlasmoidItem {
     Sensors.Sensor { id: mem; sensorId: "memory/physical/usedPercent"; updateRateLimit: 2000 }
     Sensors.Sensor { id: temp; sensorId: "cpu/all/maximumTemperature"; updateRateLimit: 2000 }
     Sensors.Sensor { id: gpu; sensorId: "gpu/all/usage"; updateRateLimit: 1000 }
+    Sensors.Sensor { id: disk; sensorId: "disk/all/usedPercent"; updateRateLimit: 5000 }
+    Sensors.Sensor { id: diskRead; sensorId: "disk/all/read"; updateRateLimit: 1000 }
+    Sensors.Sensor { id: diskWrite; sensorId: "disk/all/write"; updateRateLimit: 1000 }
     Sensors.Sensor { id: down; sensorId: "network/all/download"; updateRateLimit: 1000 }
     Sensors.Sensor { id: up; sensorId: "network/all/upload"; updateRateLimit: 1000 }
     Sensors.Sensor { id: cores; sensorId: "cpu/all/coreCount" }
@@ -36,17 +39,19 @@ PlasmoidItem {
     }
 
     readonly property var readouts: [
-        { label: "REACTOR OUTPUT", short: "RCT", sensor: cpu, unit: "%", scale: 100, always: true },
-        { label: "DEFLECTOR SHIELDS", short: "SHD", sensor: mem, unit: "%", scale: 100, always: true },
-        { label: "TARGETING COMPUTER", short: "TGT", sensor: gpu, unit: "%", scale: 100, always: false },
-        { label: "HULL TEMPERATURE", short: "HUL", sensor: temp, unit: "°C", scale: 100, always: true },
+        { label: "CPU", sensor: cpu, unit: "%", scale: 100, always: true },
+        { label: "RAM", sensor: mem, unit: "%", scale: 100, always: true },
+        { label: "GPU", sensor: gpu, unit: "%", scale: 100, always: false },
+        { label: "DISK", sensor: disk, unit: "%", scale: 100, always: true },
+        { label: "CPU TEMP", sensor: temp, unit: "°C", scale: 100, always: true },
     ]
 
     toolTipMainText: "SHIP DIAGNOSTICS"
-    toolTipSubText: "Reactor " + Math.round(cpu.value || 0) + "%  ·  Shields " + Math.round(mem.value || 0) + "%"
-                    + (has(temp) ? "  ·  Hull " + Math.round(temp.value) + "°C" : "")
+    toolTipSubText: "CPU " + Math.round(cpu.value || 0) + "%  ·  RAM " + Math.round(mem.value || 0)
+                    + "%  ·  Disk " + Math.round(disk.value || 0) + "%"
+                    + (has(temp) ? "  ·  " + Math.round(temp.value) + "°C" : "")
 
-    // ---- in the panel: three compact readouts ----
+    // ---- in the panel: CPU, RAM, DISK ----
     compactRepresentation: MouseArea {
         id: compact
         readonly property real unit: Math.min(height, Kirigami.Units.gridUnit * 1.6)
@@ -60,11 +65,11 @@ PlasmoidItem {
             spacing: Kirigami.Units.largeSpacing
 
             Repeater {
-                model: [root.readouts[0], root.readouts[1], root.readouts[3]]
+                model: [root.readouts[0], root.readouts[1], root.readouts[3]]   // CPU, RAM, DISK
                 ColumnLayout {
                     spacing: Math.round(compact.unit * 0.08)
                     PlasmaComponents3.Label {
-                        text: modelData.short
+                        text: modelData.label
                         font.family: root.headFont
                         font.pixelSize: Math.max(9, Math.round(compact.unit * 0.38))
                         font.letterSpacing: 1
@@ -96,7 +101,7 @@ PlasmoidItem {
         PlasmaComponents3.Label {
             id: labelProbe
             visible: false
-            text: "TARGETING COMPUTER"
+            text: "CPU TEMP"
             font.family: root.headFont
             font.pixelSize: root.labelSize
             font.letterSpacing: 2
@@ -152,7 +157,7 @@ PlasmoidItem {
 
         // per-core reactor cells
         PlasmaComponents3.Label {
-            text: "REACTOR CELLS"
+            text: "CPU CORES"
             font: labelProbe.font
             opacity: 0.6
             Layout.topMargin: Kirigami.Units.smallSpacing
@@ -178,21 +183,27 @@ PlasmoidItem {
         }
 
         Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Qt.rgba(1, 1, 1, 0.15) }
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
-            spacing: Kirigami.Units.largeSpacing
-            PlasmaComponents3.Label {
-                text: "COMMS"
-                font: labelProbe.font
-                opacity: 0.85
-            }
-            Item { Layout.fillWidth: true }
-            PlasmaComponents3.Label {
-                text: "▼ " + root.rate(down.value) + "/s   ▲ " + root.rate(up.value) + "/s"
-                font: valueProbe.font
-                color: "#a6f2c4"
+        Repeater {
+            model: [
+                { label: "NETWORK", text: () => "▼ " + root.rate(down.value) + "/s   ▲ " + root.rate(up.value) + "/s" },
+                { label: "DISK I/O", text: () => "R " + root.rate(diskRead.value) + "/s   W " + root.rate(diskWrite.value) + "/s" },
+            ]
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Kirigami.Units.largeSpacing
+                PlasmaComponents3.Label {
+                    text: modelData.label
+                    font: labelProbe.font
+                    opacity: 0.85
+                }
+                Item { Layout.fillWidth: true }
+                PlasmaComponents3.Label {
+                    text: modelData.text()
+                    font: valueProbe.font
+                    color: "#a6f2c4"
+                }
             }
         }
+        Item { implicitHeight: Kirigami.Units.smallSpacing }
     }
 }

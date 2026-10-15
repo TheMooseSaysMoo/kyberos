@@ -15,7 +15,7 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
 | Cursors ×6 | `build/gen_cursors.py` | `icons/KyberOS-<Crystal>/cursors` | needs rsvg-convert + xcursorgen |
 | Sounds | `build/gen_sounds.py` | `sounds/KyberOS` | synthesised WAVs, no film audio |
 | Global theme | `src/plasma/look-and-feel/org.kyberos.desktop` | `plasma/look-and-feel/` | defaults, panel layout, hyperspace KSplash |
-| Diagnostics widget | `src/plasma/plasmoids/org.kyberos.diagnostics` | `plasma/plasmoids/` | reactor = CPU, shields = RAM, targeting = GPU, hull = CPU temp, comms = net |
+| Diagnostics widget | `src/plasma/plasmoids/org.kyberos.diagnostics` | `plasma/plasmoids/` | panel: CPU / RAM / DISK; popup adds GPU, CPU temp, per-core load, network and disk I/O |
 | Holoprojector | `src/kwin/effects/kyberos_open` | `kwin/effects/` | JS effect + GLSL; windows fly out of their dock icon as a hologram, dialogs/notifications materialise in place, every close powers down to a line then a point |
 | Desktop wipe | `src/kwin/effects/kyberos_wipe` | `kwin/effects/` | edge wipe between virtual desktops |
 | Boot splash | `build/gen_plymouth.py` + `src/plymouth/kyberos` | `/usr/share/plymouth/themes/kyberos` | `--system`; rebuilds initramfs |
