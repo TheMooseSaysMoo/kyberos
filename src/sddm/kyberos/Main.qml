@@ -70,7 +70,7 @@ Item {
         font.family: "Share Tech Mono"
         font.pixelSize: root.u * 0.016
         font.letterSpacing: 3
-        text: (sddm.hostName || "").toUpperCase() + "  //  " + Qt.formatDate(new Date(), "yyyy-MM-dd")
+        text: (sddm.hostName ? sddm.hostName.toUpperCase() + "  //  " : "") + Qt.formatDate(new Date(), "yyyy-MM-dd")
     }
 
     // ---- IDENTIFY console ------------------------------------------------------
@@ -79,8 +79,11 @@ Item {
         visible: root.primary
         width: Math.min(root.width * 0.86, root.u * 0.62)
         height: col.implicitHeight + root.u * 0.07
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: root.height * 0.5 - height * 0.35
+        // landscape: sit in the open space left of the planet; portrait: centred
+        readonly property real cx: root.width > root.height * 1.3 ? root.width * 0.3 : root.width * 0.5
+        anchors.horizontalCenter: parent.left
+        anchors.horizontalCenterOffset: cx
+        y: root.height * 0.5 - height * 0.4
         readonly property real cut: root.u * 0.018
 
         Plate { anchors.fill: parent; cut: panel.cut; stroke: root.accent; fill: Qt.rgba(0.024, 0.031, 0.043, 0.86) }
@@ -170,10 +173,10 @@ Item {
 
         SequentialAnimation {
             id: shake
-            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: -root.u * 0.012; duration: 50 }
-            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: root.u * 0.012; duration: 70 }
-            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: -root.u * 0.006; duration: 60 }
-            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: 0; duration: 50 }
+            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: panel.cx - root.u * 0.012; duration: 50 }
+            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: panel.cx + root.u * 0.012; duration: 70 }
+            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: panel.cx - root.u * 0.006; duration: 60 }
+            NumberAnimation { target: panel; property: "anchors.horizontalCenterOffset"; to: panel.cx; duration: 50 }
         }
     }
 
