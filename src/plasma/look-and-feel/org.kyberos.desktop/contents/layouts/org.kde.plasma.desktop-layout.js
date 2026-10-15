@@ -29,16 +29,19 @@ strip.addWidget("org.kde.plasma.panelspacer");
 if (knownWidgetTypes.indexOf("org.kyberos.diagnostics") !== -1) {
     strip.addWidget("org.kyberos.diagnostics");
 }
+// the tray sits between flexible spacers, so it widens as apps add icons
 strip.addWidget("org.kde.plasma.systemtray");
 
 // ---- floating dock ----
+// lengthMode "fit" grows the dock with every launcher/task and only starts
+// shrinking icons once it reaches the screen width; it never auto-hides.
 var dock = new Panel;
 dock.location = "bottom";
 dock.height = Math.round(gridUnit * 3.2);
 dock.floating = true;
 dock.lengthMode = "fit";
 dock.alignment = "center";
-dock.hiding = "dodgewindows";
+dock.hiding = "none";
 
 var tasks = dock.addWidget("org.kde.plasma.icontasks");
 tasks.currentConfigGroup = ["General"];
