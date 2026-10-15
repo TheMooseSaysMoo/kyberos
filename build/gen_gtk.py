@@ -194,6 +194,14 @@ menu, .menu, .context-menu {{ {bi("menu")} padding: 4px; }}
 popover.background {{ {bi("menu")} }}
 menuitem:hover, .menuitem:hover {{ background: alpha({a}, 0.28); color: {TEXT}; box-shadow: inset 2px 0 {a}; }}
 .csstage {{ background: {VOID}; }}
+.csstage .clock {{ color: {TEXT}; text-shadow: 0 0 12px alpha({a}, 0.6); }}
+.csstage .unlockbox {{ color: {TEXT}; font-family: "{FONTS['mono']}"; }}
+.csstage .passwordentry {{ border-radius: 0; border: 1px solid {a}; background-color: alpha({VOID}, 0.85);
+  color: {DATA}; font-family: "{FONTS['mono']}"; box-shadow: inset 0 -2px {a}; }}
+.csstage .auth-message {{ color: {ALERT}; font-family: "{FONTS['mono']}"; letter-spacing: 2px; }}
+.csstage .caps-message {{ color: {AMBER}; font-family: "{FONTS['mono']}"; }}
+.csstage .toppanel {{ background-image: none; background-color: alpha({PANEL}, 0.85); border-color: alpha({a}, 0.5); }}
+.csstage .framedimage {{ border-radius: 0; border-color: {a}; }}
 """
 
 

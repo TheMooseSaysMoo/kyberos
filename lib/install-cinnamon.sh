@@ -140,6 +140,15 @@ cin_apply() {
     $gs org.nemo.desktop font "Exo 2 10" 2>/dev/null || true
     $gs org.cinnamon.desktop.sound theme-name KyberOS 2>/dev/null || true
     $gs org.cinnamon.desktop.sound event-sounds true 2>/dev/null || true
+    # lock screen (cinnamon-screensaver): fonts + message are settings, the rest is GTK CSS
+    local ss=org.cinnamon.desktop.screensaver
+    $gs $ss font-time "Michroma 54" 2>/dev/null || true
+    $gs $ss font-date "Share Tech Mono 16" 2>/dev/null || true
+    $gs $ss font-message "Exo 2 14" 2>/dev/null || true
+    $gs $ss use-custom-format true 2>/dev/null || true
+    $gs $ss time-format "%H:%M" 2>/dev/null || true
+    $gs $ss date-format "%Y-%m-%d  //  %A" 2>/dev/null || true
+    $gs $ss default-message "AUTHORIZATION REQUIRED" 2>/dev/null || true
     cin_gtk4
     cin_terminal
     # window effects: KyberOS holoprojector extension
