@@ -31,6 +31,7 @@ Window {
                 scene: modelData.scene
                 crystal: win.args[3]
                 animate: true          // let the scene settle into a representative frame
+                still: true
             }
         }
     }

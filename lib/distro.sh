@@ -42,9 +42,9 @@ kyb_pkg() {
             fedora:gdbus) echo glib2 ;;             debian:gdbus) echo libglib2.0-bin ;;   arch:gdbus) echo glib2 ;;
             fedora:python) echo python3 ;;          debian:python) echo python3 ;;         arch:python) echo python ;;
             # Cinnamon side: the qml runtime + modules (scene renders), xrandr, dconf
-            fedora:qml) echo qt6-qtdeclarative-devel ;;
-            debian:qml) echo qml-qt6 qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
-            arch:qml) echo qt6-declarative ;;
+            fedora:qml) echo qt6-qtdeclarative-devel qt6-qtsvg ;;
+            debian:qml) echo qml-qt6 qt6-svg-plugins qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
+            arch:qml) echo qt6-declarative qt6-svg ;;
             fedora:xrandr) echo xrandr ;;           debian:xrandr) echo x11-xserver-utils ;; arch:xrandr) echo xorg-xrandr ;;
             fedora:dconf) echo dconf ;;             debian:dconf) echo dconf-cli ;;         arch:dconf) echo dconf ;;
             *:zstd) echo zstd ;; *:curl) echo curl ;; *:fontconfig) echo fontconfig ;;

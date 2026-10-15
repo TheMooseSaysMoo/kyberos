@@ -76,6 +76,26 @@ cin_gtk4() {
     done
 }
 
+cin_spice_set() {
+    # cin_spice_set <applet uuid> <instance> key=<json value>...: edit an applet's settings once
+    # Cinnamon has written them (it watches the file and applies changes live)
+    local uuid=$1 id=$2 f
+    shift 2
+    f=$CONF/cinnamon/spices/$uuid/$id.json
+    for _ in $(seq 1 30); do [ -f "$f" ] && break; sleep 0.5; done
+    [ -f "$f" ] || return 1
+    python3 - "$f" "$@" <<'PY'
+import json, sys
+path, pairs = sys.argv[1], sys.argv[2:]
+cfg = json.load(open(path))
+for pair in pairs:
+    k, v = pair.split("=", 1)
+    k = k.strip('"')
+    cfg.setdefault(k, {"type": "generic"})["value"] = json.loads(v)
+json.dump(cfg, open(path, "w"), indent=4)
+PY
+}
+
 cin_layout() {
     # top strip: menu, workspaces | clock | diagnostics, tray, status; bottom: centred task bar
     local pinned_json="" f
@@ -95,21 +115,10 @@ cin_layout() {
         'panel1:right:4:network@cinnamon.org:108', 'panel1:right:5:sound@cinnamon.org:109',
         'panel1:right:6:power@cinnamon.org:110',
         'panel2:center:0:grouped-window-list@cinnamon.org:111']"
-    if [ -n "$pinned_json" ]; then
-        # the new task bar writes its settings file on load; then carry the pinned apps over
-        f=$CONF/cinnamon/spices/grouped-window-list@cinnamon.org/111.json
-        for _ in $(seq 1 20); do [ -f "$f" ] && break; sleep 0.5; done
-        if [ -f "$f" ]; then
-            python3 - "$f" "$pinned_json" <<'PY'
-import json, sys
-path, pinned = sys.argv[1], json.loads(sys.argv[2])
-cfg = json.load(open(path))
-cfg.setdefault("pinned-apps", {"type": "generic", "default": []})["value"] = pinned
-json.dump(cfg, open(path, "w"), indent=4)
-PY
-            say "kept your pinned apps in the task bar"
-        fi
-    fi
+    [ -n "$pinned_json" ] && cin_spice_set grouped-window-list@cinnamon.org 111 "pinned-apps=$pinned_json" &&
+        say "kept your pinned apps in the task bar"
+    cin_spice_set menu@cinnamon.org 101 'menu-custom=true' '"menu-icon"="start-here-kyberos"' 'menu-icon-size=22' '"menu-label"=""'  || true
+    cin_spice_set calendar@cinnamon.org 103 'use-custom-format=true' '"custom-format"="%Y-%m-%d   %H:%M"' || true
 }
 
 cin_apply() {

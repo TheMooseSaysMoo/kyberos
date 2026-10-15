@@ -15,6 +15,7 @@ Item {
     property string crystal: "blue"
     property string scene: "tactical"      // tactical | schematic | targeting | comms
     property bool animate: true
+    property bool still: false            // rendering a still image: leave out the moving scan band
     property string banner: ""
     property int sweepSeconds: 6
 
@@ -72,7 +73,7 @@ Item {
         width: parent.width
         height: parent.height * 0.12
         opacity: 0.06
-        visible: root.animate
+        visible: root.animate && !root.still
         gradient: Gradient {
             GradientStop { position: 0.0; color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0) }
             GradientStop { position: 0.9; color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.6) }
