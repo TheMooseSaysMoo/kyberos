@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [{ "Name": "KyberOS" }],
+        "Category": "",
+        "Description": "Imperial console desktop: cold steel, kyber crystal accents, hyperspace splash",
+        "Id": "org.kyberos.desktop",
+        "License": "GPL-3.0-or-later",
+        "Name": "KyberOS",
+        "Version": "0.1",
+        "Website": "https://github.com/TheMooseSaysMoo/kyberos"
+    },
+    "Keywords": "Desktop;Workspace;Appearance;Look and Feel;KyberOS;Star Wars;",
+    "X-Plasma-APIVersion": "2"
+}

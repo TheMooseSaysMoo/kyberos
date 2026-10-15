@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="Crystal" type="String">
+      <label>Kyber crystal colour of the base image (blue, green, red, purple, yellow, white)</label>
+      <default>blue</default>
+    </entry>
+    <entry name="Banner" type="String">
+      <label>Optional banner line, e.g. AUTHORIZATION REQUIRED on the lock screen</label>
+      <default></default>
+    </entry>
+    <entry name="Animate" type="Bool">
+      <label>Animate radar sweep, scan line and lights</label>
+      <default>true</default>
+    </entry>
+    <entry name="SweepSeconds" type="Int">
+      <label>Seconds per radar revolution</label>
+      <default>6</default>
+    </entry>
+  </group>
+</kcfg>

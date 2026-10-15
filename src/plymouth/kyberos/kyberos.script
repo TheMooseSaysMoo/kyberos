@@ -1,0 +1,134 @@
+// KyberOS boot splash: jump to hyperspace, saber ignites with boot progress.
+
+Window.SetBackgroundTopColor(0.024, 0.031, 0.043);
+Window.SetBackgroundBottomColor(0.024, 0.031, 0.043);
+
+W = Window.GetWidth();
+H = Window.GetHeight();
+CX = Window.GetX() + W / 2;
+CY = Window.GetY() + H / 2;
+MAXD = Math.Sqrt(W * W + H * H) / 2 + 160;
+
+// ---- wordmark ----
+logo_raw = Image("logo.png");
+logo_scale = Math.Min(1, (W * 0.38) / logo_raw.GetWidth());
+logo_img = logo_raw.Scale(logo_raw.GetWidth() * logo_scale, logo_raw.GetHeight() * logo_scale);
+logo = Sprite(logo_img);
+logo.SetPosition(CX - logo_img.GetWidth() / 2, CY - logo_img.GetHeight() / 2 - 30, 20);
+logo.SetOpacity(0);
+
+// ---- starfield ----
+NSTARS = 110;
+streaks[0] = Image("streak0.png");
+streaks[1] = Image("streak1.png");
+streaks[2] = Image("streak2.png");
+streaks[3] = Image("streak3.png");
+
+fun spawn(i, near) {
+    star[i].angle = Math.Random() * 2 * Math.Pi;
+    if (near)
+        star[i].dist = 8 + Math.Random() * 40;
+    else
+        star[i].dist = 8 + Math.Random() * MAXD;
+    star[i].speed = 0.55 + Math.Random() * 0.9;
+    star[i].level = -1;
+}
+
+for (i = 0; i < NSTARS; i++) {
+    spawn(i, 0);
+    for (k = 0; k < 4; k++)
+        star[i].img[k] = streaks[k].Rotate(star[i].angle);
+    star[i].sprite = Sprite();
+    star[i].sprite.SetZ(5);
+}
+
+frame = 0;
+
+fun refresh() {
+    frame++;
+    // warp factor ramps up over the first ~2.5 s, then holds
+    warp = Math.Min(1, frame / 125);
+    for (i = 0; i < NSTARS; i++) {
+        v = (0.6 + star[i].dist * 0.035 * (0.3 + warp * 1.7)) * star[i].speed;
+        star[i].dist += v;
+        if (star[i].dist > MAXD) {
+            // keep each star's rotated images: respawn on the same ray
+            star[i].dist = 8 + Math.Random() * 40;
+            star[i].level = -1;
+        }
+        if (v < 2.5) lvl = 0;
+        else if (v < 7) lvl = 1;
+        else if (v < 16) lvl = 2;
+        else lvl = 3;
+        if (lvl != star[i].level) {
+            star[i].sprite.SetImage(star[i].img[lvl]);
+            star[i].level = lvl;
+        }
+        img = star[i].img[lvl];
+        x = CX + Math.Cos(star[i].angle) * star[i].dist;
+        y = CY + Math.Sin(star[i].angle) * star[i].dist;
+        star[i].sprite.SetPosition(x - img.GetWidth() / 2, y - img.GetHeight() / 2, 5);
+        star[i].sprite.SetOpacity(Math.Min(1, star[i].dist / 160));
+    }
+    if (frame < 60)
+        logo.SetOpacity(frame / 60);
+    else
+        logo.SetOpacity(1);
+}
+Plymouth.SetRefreshFunction(refresh);
+
+// ---- saber progress ----
+hilt_img = Image("hilt.png");
+blade_raw = Image("blade.png");
+BAR_W = Math.Min(520, W * 0.4);
+BAR_X = CX - (BAR_W + hilt_img.GetWidth()) / 2;
+BAR_Y = CY + 90;
+hilt = Sprite(hilt_img);
+hilt.SetPosition(BAR_X, BAR_Y, 20);
+blade = Sprite();
+blade.SetZ(20);
+
+fun progress(duration, p) {
+    w = Math.Int(BAR_W * p);
+    if (w < 2) return;
+    blade.SetImage(blade_raw.Scale(w, blade_raw.GetHeight()));
+    blade.SetPosition(BAR_X + hilt_img.GetWidth() - 2, BAR_Y, 20);
+}
+Plymouth.SetBootProgressFunction(progress);
+
+// ---- password (LUKS) ----
+entry_img = Image("entry.png");
+bullet_img = Image("bullet.png");
+
+fun show_password(prompt, bullets) {
+    entry.sprite = Sprite(entry_img);
+    entry.sprite.SetPosition(CX - entry_img.GetWidth() / 2, CY + 150, 30);
+    prompt_img = Image.Text(prompt, 0.84, 0.87, 0.91, 1, "Sans 12");
+    entry.prompt = Sprite(prompt_img);
+    entry.prompt.SetPosition(CX - prompt_img.GetWidth() / 2, CY + 120, 30);
+    for (i = 0; i < 40; i++) {
+        if (!entry.bullet[i]) entry.bullet[i] = Sprite(bullet_img);
+        if (i < bullets) {
+            entry.bullet[i].SetPosition(CX - entry_img.GetWidth() / 2 + 20 + i * 18, CY + 165, 31);
+            entry.bullet[i].SetOpacity(1);
+        } else {
+            entry.bullet[i].SetOpacity(0);
+        }
+    }
+}
+Plymouth.SetDisplayPasswordFunction(show_password);
+
+fun normal_display() {
+    entry.sprite = NULL;
+    entry.prompt = NULL;
+    for (i = 0; i < 40; i++) if (entry.bullet[i]) entry.bullet[i].SetOpacity(0);
+}
+Plymouth.SetDisplayNormalFunction(normal_display);
+
+// ---- messages ----
+fun message(text) {
+    msg_img = Image.Text(text, 0.53, 0.58, 0.64, 1, "Sans 10");
+    msg = Sprite(msg_img);
+    msg.SetPosition(CX - msg_img.GetWidth() / 2, H - 60, 30);
+}
+Plymouth.SetMessageFunction(message);

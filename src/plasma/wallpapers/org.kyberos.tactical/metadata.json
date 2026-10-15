@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [{ "Name": "KyberOS" }],
+        "Category": "",
+        "Description": "Animated Imperial tactical display: radar sweep, scan line and status lights",
+        "Icon": "kyberos",
+        "Id": "org.kyberos.tactical",
+        "License": "GPL-3.0-or-later",
+        "Name": "KyberOS Tactical",
+        "Version": "0.1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# kyberos-crystal <blue|green|red|purple|yellow|white> [--quiet]
+# Re-tunes every KyberOS piece in this session to one kyber crystal colour.
+# (Boot splash + login greeter: re-run install.sh --crystal X --system.)
+set -euo pipefail
+
+crystal=${1:-}
+quiet=0
+[ "${2:-}" = --quiet ] && quiet=1
+declare -A HEX=([blue]="#33b5ff" [green]="#3ef08a" [red]="#ff2d3f" [purple]="#b264ff" [yellow]="#ffd23c" [white]="#e2f4ff")
+if [ -z "$crystal" ] || [ -z "${HEX[$crystal]:-}" ]; then
+    echo "usage: kyberos-crystal <blue|green|red|purple|yellow|white>" >&2
+    exit 2
+fi
+Cap=${crystal^}
+hex=${HEX[$crystal]}
+w() { kwriteconfig6 "$@"; }
+
+plasma-apply-colorscheme "KyberOS$Cap" >/dev/null
+plasma-apply-cursortheme "KyberOS-$Cap" >/dev/null 2>&1 || true
+
+w --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
+w --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__KyberOS-$Cap"
+w --file kwinrc --group Effect-kyberos_open --key Accent "$hex"
+w --file kwinrc --group Effect-kyberos_wipe --key Accent "$hex"
+
+# terminal colours
+profile=${XDG_DATA_HOME:-$HOME/.local/share}/konsole/KyberOS.profile
+[ -f "$profile" ] && w --file "$profile" --group Appearance --key ColorScheme "KyberOS$Cap"
+
+# lock screen wallpaper
+w --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kyberos.tactical --group General --key Crystal "$crystal"
+
+# desktop wallpaper (every desktop using the tactical plugin)
+gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell --method org.kde.PlasmaShell.evaluateScript "
+    desktops().forEach(function (d) {
+        if (d.wallpaperPlugin !== 'org.kyberos.tactical') return;
+        d.currentConfigGroup = ['Wallpaper', 'org.kyberos.tactical', 'General'];
+        d.writeConfig('Crystal', '$crystal');
+    });" >/dev/null 2>&1 || true
+
+gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KWin.reconfigure >/dev/null 2>&1 || true
+for e in kyberos_open kyberos_wipe; do
+    gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.reconfigureEffect "$e" >/dev/null 2>&1 || true
+done
+
+echo "$crystal" > "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal" 2>/dev/null || true
+
+[ $quiet = 1 ] || echo "kyber crystal: $Cap ($hex)"

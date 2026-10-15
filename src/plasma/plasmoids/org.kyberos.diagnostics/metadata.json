@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "KyberOS" }],
+        "Category": "System Information",
+        "Description": "Ship diagnostics: reactor (CPU), shields (memory), targeting (GPU), hull temperature and comms",
+        "Icon": "kyberos",
+        "Id": "org.kyberos.diagnostics",
+        "License": "GPL-3.0-or-later",
+        "Name": "KyberOS Ship Diagnostics",
+        "Version": "0.1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

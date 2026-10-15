@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "KWin/Effect",
+    "KPlugin": {
+        "Authors": [{ "Name": "KyberOS" }],
+        "Category": "Virtual Desktop Switching Animation",
+        "Description": "Switch virtual desktops with a cinematic edge wipe",
+        "EnabledByDefault": false,
+        "Id": "kyberos_wipe",
+        "License": "GPL-3.0-or-later",
+        "Name": "KyberOS Wipe"
+    },
+    "X-KDE-ConfigModule": "kcm_kwin4_genericscripted",
+    "X-KDE-Ordering": 50,
+    "X-KWin-Exclusive-Category": "desktop-animations",
+    "X-Plasma-API": "javascript"
+}

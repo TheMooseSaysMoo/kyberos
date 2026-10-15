@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=KyberOS
+Description=Hyperspace jump with a lightsaber progress bar
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/kyberos
+ScriptFile=/usr/share/plymouth/themes/kyberos/kyberos.script
