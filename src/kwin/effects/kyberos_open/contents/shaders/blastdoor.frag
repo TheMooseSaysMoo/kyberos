@@ -52,10 +52,10 @@ void main()
         vec3 steel = mix(vec3(0.13, 0.155, 0.19), vec3(0.22, 0.26, 0.31), 1.0 - clamp(inner / doorW, 0.0, 1.0));
         steel += (hash(floor(px.x * 0.5)) - 0.5) * 0.03;
         // horizontal ribs
-        float rib = step(fract(px.y / 48.0), 0.04);
+        float rib = step(fract(px.y / 140.0), 0.012);
         steel = mix(steel, vec3(0.06, 0.07, 0.09), rib * 0.9);
         // panel seam every 72 px from the leading edge
-        float seam = step(mod(inner, 72.0), 1.5) * step(30.0, inner);
+        float seam = step(mod(inner, 180.0), 1.5) * step(40.0, inner);
         steel = mix(steel, vec3(0.04, 0.05, 0.06), seam);
         // hazard stripes behind the leading edge
         float stripe = step(0.5, fract((px.x + px.y) / 20.0));
