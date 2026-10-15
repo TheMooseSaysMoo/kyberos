@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Grab the KyberOS-Test VM framebuffer from Unraid (dev helper; virtio-gpu gives PNG).
-# usage: tools/vmshot.sh out.png
+# Grab a libvirt test VM's framebuffer (dev helper for README screenshots).
+# usage: VM_HOST=<ssh host running libvirt> tools/vmshot.sh <domain> [out.png]
 set -euo pipefail
-out=${1:-vmshot.png}
-ssh unraid 'virsh screenshot KyberOS-Test /tmp/kyberos-shot.png >/dev/null && cat /tmp/kyberos-shot.png && rm -f /tmp/kyberos-shot.png' > "$out"
+: "${VM_HOST:?set VM_HOST to the ssh host that runs libvirt}"
+dom=${1:?usage: VM_HOST=host tools/vmshot.sh <domain> [out.png]}
+out=${2:-vmshot.png}
+ssh "$VM_HOST" "virsh screenshot '$dom' /tmp/kyberos-shot.img >/dev/null && cat /tmp/kyberos-shot.img && rm -f /tmp/kyberos-shot.img" |
+    python3 -c "import io, sys; from PIL import Image; Image.open(io.BytesIO(sys.stdin.buffer.read())).save(sys.argv[1])" "$out"
 echo "$out"
