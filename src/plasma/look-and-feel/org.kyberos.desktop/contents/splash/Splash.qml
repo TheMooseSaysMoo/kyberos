@@ -52,8 +52,9 @@ Rectangle {
                         GradientStop { position: 0.7; color: "#9fd8ff" }
                         GradientStop { position: 1.0; color: "#ffffff" }
                     }
+                    // Animators fix their from/to when they start, so wait for the real size
                     ParallelAnimation {
-                        running: true
+                        running: field.width > 0 && field.height > 0
                         loops: Animation.Infinite
                         XAnimator { target: streak; from: 6 - streak.width; to: field.maxD; duration: star.dur; easing.type: Easing.InQuad }
                         ScaleAnimator { target: streak; from: 0.05; to: 1.8; duration: star.dur; easing.type: Easing.InQuad }
