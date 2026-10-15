@@ -36,7 +36,7 @@ KWin.TabBoxSwitcher {
                 readonly property color accent: Kirigami.Theme.highlightColor
 
                 width: Math.max(Kirigami.Units.gridUnit * 22, Math.min(maxWidth, list.count * cellW + Kirigami.Units.gridUnit))
-                height: header.height + thumbH + Kirigami.Units.gridUnit * 5
+                height: header.height + thumbH + Kirigami.Units.gridUnit * 3.6
 
                 // ---- header: SELECT TARGET ............ 03 / 07 ----
                 RowLayout {
