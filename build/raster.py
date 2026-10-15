@@ -13,7 +13,7 @@ def png(svg_path, png_path, width=None, height=None):
     global _warned
     if not available():
         if not _warned:
-            print("    ! rsvg-convert missing: PNGs skipped (dnf install librsvg2-tools)")
+            print("    ! rsvg-convert missing: PNGs skipped (install librsvg: librsvg2-tools / librsvg2-bin / librsvg)")
             _warned = True
         return False
     cmd = ["rsvg-convert", "-o", str(png_path)]

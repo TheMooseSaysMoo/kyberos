@@ -6,10 +6,11 @@
 #     system.tar.zst      /etc/plymouth, /etc/plasmalogin.conf*, /var/lib/plasmalogin,
 #                         /etc/default/grub, /usr/local/share, /etc/sddm*
 #     initramfs-<kver>.img  copy of the current initramfs (KyberOS's Plymouth step rebuilds it)
-#     plymouth-theme, cmdline, rpm-qa.txt, snapshots.txt
+#     plymouth-theme, cmdline, packages.txt, display-manager, snapshots.txt
 #   btrfs: snapper snapshot of / ("pre-KyberOS") and a read-only snapshot of the /home
 #   subvolume at the top level of the filesystem (not inside /home, so home backups skip it)
 set -uo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/../lib/distro.sh"
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
 STAMP=${1:-$(date +%Y%m%d-%H%M%S)}
 OUT=/var/lib/kyberos-rollback/$STAMP
@@ -22,16 +23,22 @@ theme=$(plymouth-set-default-theme 2>/dev/null || true)
 [ -n "$theme" ] && [ -d "/usr/share/plymouth/themes/$theme" ] && paths+=("/usr/share/plymouth/themes/$theme")
 for p in /etc/plymouth /etc/plasmalogin.conf /etc/plasmalogin.conf.d /var/lib/plasmalogin \
          /etc/default/grub /usr/local/share /etc/sddm.conf /etc/sddm.conf.d /var/lib/sddm/.config \
-         /usr/share/plymouth/themes/default.plymouth; do
+         /usr/share/plymouth/themes/default.plymouth /etc/mkinitcpio.conf /etc/initramfs-tools/conf.d; do
     [ -e "$p" ] && paths+=("$p")
 done
-tar --zstd -cpf "$OUT/system.tar.zst" --xattrs --acls --selinux "${paths[@]}" 2>"$OUT/tar-warnings.txt" \
+TAROPTS=(--xattrs --acls); command -v restorecon >/dev/null && TAROPTS+=(--selinux)   # SELinux distros
+tar --zstd -cpf "$OUT/system.tar.zst" "${TAROPTS[@]}" "${paths[@]}" 2>"$OUT/tar-warnings.txt" \
     || { echo "tar failed, see $OUT/tar-warnings.txt" >&2; exit 1; }
 kver=$(uname -r)
-cp -a "/boot/initramfs-$kver.img" "$OUT/" 2>/dev/null && echo "$kver" > "$OUT/kernel"
+# Fedora: initramfs-<kver>.img, Debian: initrd.img-<kver>, Arch: initramfs-linux*.img
+for f in "/boot/initramfs-$kver.img" "/boot/initrd.img-$kver" /boot/initramfs-linux*.img; do
+    [ -f "$f" ] && cp -a "$f" "$OUT/"
+done
+echo "$kver" > "$OUT/kernel"
 echo "$theme" > "$OUT/plymouth-theme"
 cat /proc/cmdline > "$OUT/cmdline"
-rpm -qa --qf '%{NAME}\n' | sort > "$OUT/rpm-qa.txt"
+kyb_packages > "$OUT/packages.txt"
+kyb_dm > "$OUT/display-manager"
 
 # ---- whole-machine snapshots ----
 : > "$OUT/snapshots.txt"
@@ -53,6 +60,6 @@ if [ "$(findmnt -no FSTYPE /home)" = btrfs ]; then
     fi
     rmdir "$top"
 fi
-(cd "$OUT" && sha256sum system.tar.zst initramfs-*.img 2>/dev/null > SHA256SUMS)
+(cd "$OUT" && sha256sum system.tar.zst initramfs-*.img initrd.img-* 2>/dev/null > SHA256SUMS)
 [ -e /var/lib/kyberos-rollback/pre-kyberos ] || ln -s "$STAMP" /var/lib/kyberos-rollback/pre-kyberos
 say "done: $OUT"

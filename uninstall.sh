@@ -9,11 +9,18 @@ CONF=${XDG_CONFIG_HOME:-$HOME/.config}
 STATE=$DATA/kyberos
 BACKUP=$STATE/backup-original
 
+# a stock look that exists on this distro
+stock() {
+    for l in org.fedoraproject.fedora.desktop org.kde.breezedark.desktop org.kde.breeze.desktop; do
+        kpackagetool6 --type Plasma/LookAndFeel --show "$l" >/dev/null 2>&1 && { echo "$l"; return; }
+    done
+    echo org.kde.breeze.desktop
+}
 say() { printf '\033[1;36m[kyberos]\033[0m %s\n' "$*"; }
 
 if [ -d "$BACKUP" ]; then
     prev=$(cat "$BACKUP/lookandfeel" 2>/dev/null || true)
-    plasma-apply-lookandfeel -a "${prev:-org.fedoraproject.fedora.desktop}" >/dev/null 2>&1 || true
+    plasma-apply-lookandfeel -a "${prev:-$(stock)}" >/dev/null 2>&1 || true
     (cd "$BACKUP" && find . -type f ! -name lookandfeel) | while read -r rel; do
         mkdir -p "$CONF/$(dirname "$rel")"
         cp -a "$BACKUP/$rel" "$CONF/$rel"
@@ -22,8 +29,8 @@ if [ -d "$BACKUP" ]; then
     [ -f "$BACKUP/Kvantum/kvantum.kvconfig" ] || rm -f "$CONF/Kvantum/kvantum.kvconfig"
     say "restored settings from $BACKUP"
 else
-    say "no backup found; switching to the Fedora look"
-    plasma-apply-lookandfeel -a org.fedoraproject.fedora.desktop >/dev/null 2>&1 || true
+    say "no backup found; switching to the stock look"
+    plasma-apply-lookandfeel -a "$(stock)" >/dev/null 2>&1 || true
 fi
 
 rm -f "$DATA"/color-schemes/KyberOS*.colors "$DATA"/konsole/KyberOS*

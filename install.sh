@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KyberOS installer (Plasma 6 / Fedora).
+# KyberOS installer (Plasma 6 on Fedora, Debian/Ubuntu or Arch).
 #
 #   ./install.sh                  build + install for this user, apply theme, keep panels
 #   ./install.sh --layout         ...and replace the panel layout with the KyberOS one (pinned apps kept)
@@ -12,6 +12,7 @@
 set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")" && pwd)
+. "$HERE/lib/distro.sh"
 DATA=${XDG_DATA_HOME:-$HOME/.local/share}
 CONF=${XDG_CONFIG_HOME:-$HOME/.config}
 STATE=$DATA/kyberos
@@ -37,14 +38,23 @@ Cap=${CRYSTAL^}
 say() { printf '\033[1;36m[kyberos]\033[0m %s\n' "$*"; }
 
 # ---- dependencies ------------------------------------------------------
+if ! command -v kpackagetool6 >/dev/null || ! command -v plasma-apply-lookandfeel >/dev/null; then
+    echo "KyberOS needs KDE Plasma 6 (kpackagetool6 / plasma-apply-lookandfeel not found)." >&2
+    exit 1
+fi
+[ "$KYB_FAMILY" = unknown ] && echo "  ! unrecognised distro: install librsvg (rsvg-convert), xcursorgen, kwriteconfig6, Kvantum (Qt6) and the QtQuick.Shapes QML module yourself" >&2
 need=()
-command -v rsvg-convert >/dev/null || need+=(librsvg2-tools)
-command -v xcursorgen >/dev/null || need+=(xcursorgen)
-command -v kwriteconfig6 >/dev/null || need+=(kf6-kconfig)
-rpm -q kvantum >/dev/null 2>&1 || need+=(kvantum)
-if [ ${#need[@]} -gt 0 ]; then
-    say "installing build tools: ${need[*]} (sudo)"
-    sudo dnf -y install "${need[@]}"
+command -v rsvg-convert >/dev/null || need+=($(kyb_pkg rsvg))
+command -v xcursorgen >/dev/null || need+=($(kyb_pkg xcursorgen))
+command -v kwriteconfig6 >/dev/null || need+=($(kyb_pkg kconfig))
+command -v gdbus >/dev/null || need+=($(kyb_pkg gdbus))
+command -v python3 >/dev/null || need+=($(kyb_pkg python))
+command -v curl >/dev/null || need+=($(kyb_pkg curl))
+command -v fc-cache >/dev/null || need+=($(kyb_pkg fontconfig))
+for d in kvantum shapes; do kyb_installed "$(kyb_pkg $d)" || need+=($(kyb_pkg $d)); done
+if [ ${#need[@]} -gt 0 ] && [ "$KYB_FAMILY" != unknown ]; then
+    say "installing: ${need[*]} ($KYB_FAMILY, sudo)"
+    sudo bash -c ". '$HERE/lib/distro.sh'; kyb_install ${need[*]}"
 fi
 
 # ---- fonts (SIL OFL, from google/fonts) ---------------------------------
@@ -147,7 +157,7 @@ if [ $APPLY = 1 ]; then
     w --file kdeglobals --group General --key fixed "Share Tech Mono,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
     w --file kdeglobals --group WM --key activeFont "Orbitron,9,-1,5,600,0,0,0,0,0,0,0,0,0,0,1"
     # app widgets: Kvantum (chamfered steel controls) when available
-    if rpm -q kvantum >/dev/null 2>&1; then
+    if kyb_installed "$(kyb_pkg kvantum)" || command -v kvantummanager >/dev/null; then
         w --file kdeglobals --group KDE --key widgetStyle kvantum
     fi
     # sounds

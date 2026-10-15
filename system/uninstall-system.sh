@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Undo system/install-system.sh (run as root).
+# Undo system/install-system.sh (run as root). Works on Fedora, Debian/Ubuntu and Arch.
 set -euo pipefail
+HERE=$(cd "$(dirname "$0")" && pwd)
+. "$HERE/../lib/distro.sh"
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
 STATE=/var/lib/kyberos
 LOCAL=/usr/local/share
@@ -8,14 +10,21 @@ LOCAL=/usr/local/share
 if [ -f "$STATE/plymouth-previous" ]; then
     prev=$(cat "$STATE/plymouth-previous")
     echo "[kyberos] restoring boot splash '$prev' (rebuilding initramfs)"
-    plymouth-set-default-theme -R "$prev"
+    kyb_plymouth_set "$prev" || echo "[kyberos] could not restore '$prev'"
 fi
 rm -rf /usr/share/plymouth/themes/kyberos
 
+# Plasma Login Manager
 rm -f /etc/plasmalogin.conf.d/50-kyberos.conf
-rm -f /var/lib/plasmalogin/.config/kdeglobals /var/lib/plasmalogin/.config/plasmarc /var/lib/plasmalogin/.config/kcminputrc
-rm -rf "$LOCAL/plasma/desktoptheme/KyberOS" "$LOCAL/plasma/wallpapers/org.kyberos.tactical" "$LOCAL/fonts/kyberos"
+if G=$(getent passwd plasmalogin | cut -d: -f6) && [ -n "$G" ]; then
+    rm -f "$G/.config/kdeglobals" "$G/.config/plasmarc" "$G/.config/kcminputrc"
+fi
+rm -rf "$LOCAL/plasma/desktoptheme/KyberOS" "$LOCAL/plasma/wallpapers/org.kyberos.tactical"
 rm -f "$LOCAL"/color-schemes/KyberOS*.colors
-rm -rf "$LOCAL"/icons/KyberOS-*
+# SDDM
+rm -f /etc/sddm.conf.d/50-kyberos.conf
+rm -rf /usr/share/sddm/themes/kyberos
+# shared
+rm -rf "$LOCAL/fonts/kyberos" "$LOCAL"/icons/KyberOS-* /usr/share/icons/KyberOS-*
 rm -rf "$STATE"
 echo "[kyberos] system pieces removed"
