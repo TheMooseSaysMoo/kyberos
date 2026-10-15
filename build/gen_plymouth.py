@@ -17,10 +17,13 @@ def svg(w, h, body):
 
 
 def streak(length, a):
-    h = 4
-    return svg(length + 4, h, f'<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="{a}" stop-opacity="0"/>'
-                              f'<stop offset="0.7" stop-color="{mix(a, "#ffffff", 0.5)}" stop-opacity="0.8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>'
-                              f'<rect x="2" y="1" width="{length}" height="2" rx="1" fill="url(#g)"/>')
+    # square canvas: Plymouth's Image.Rotate keeps the original bounds, so a
+    # thin strip would be clipped away at most angles
+    n = length + 8
+    y = n / 2 - 1
+    return svg(n, n, f'<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="{a}" stop-opacity="0"/>'
+                     f'<stop offset="0.7" stop-color="{mix(a, "#ffffff", 0.5)}" stop-opacity="0.8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>'
+                     f'<rect x="4" y="{y}" width="{length}" height="2" rx="1" fill="url(#g)"/>')
 
 
 def generate(out):

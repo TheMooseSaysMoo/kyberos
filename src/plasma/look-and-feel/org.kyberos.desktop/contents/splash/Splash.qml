@@ -106,7 +106,7 @@ Rectangle {
         opacity: 0
         SequentialAnimation {
             id: flash
-            NumberAnimation { target: flashRect; property: "opacity"; to: 0.85; duration: 160 }
+            NumberAnimation { target: flashRect; property: "opacity"; to: 0.55; duration: 140 }
             NumberAnimation { target: flashRect; property: "opacity"; to: 0; duration: 700 }
         }
     }

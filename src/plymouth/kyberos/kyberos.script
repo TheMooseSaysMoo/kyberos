@@ -3,18 +3,18 @@
 Window.SetBackgroundTopColor(0.024, 0.031, 0.043);
 Window.SetBackgroundBottomColor(0.024, 0.031, 0.043);
 
-W = Window.GetWidth();
-H = Window.GetHeight();
-CX = Window.GetX() + W / 2;
-CY = Window.GetY() + H / 2;
-MAXD = Math.Sqrt(W * W + H * H) / 2 + 160;
+fun measure() {
+    global.W = Window.GetWidth();
+    global.H = Window.GetHeight();
+    global.CX = Window.GetX() + W / 2;
+    global.CY = Window.GetY() + H / 2;
+    global.MAXD = Math.Sqrt(W * W + H * H) / 2 + 160;
+}
+measure();
 
 // ---- wordmark ----
 logo_raw = Image("logo.png");
-logo_scale = Math.Min(1, (W * 0.38) / logo_raw.GetWidth());
-logo_img = logo_raw.Scale(logo_raw.GetWidth() * logo_scale, logo_raw.GetHeight() * logo_scale);
-logo = Sprite(logo_img);
-logo.SetPosition(CX - logo_img.GetWidth() / 2, CY - logo_img.GetHeight() / 2 - 30, 20);
+logo = Sprite();
 logo.SetOpacity(0);
 
 // ---- starfield ----
@@ -46,6 +46,10 @@ frame = 0;
 
 fun refresh() {
     frame++;
+    if (Window.GetWidth() != W || Window.GetHeight() != H) {
+        layout();
+        progress(0, last_progress);
+    }
     // warp factor ramps up over the first ~2.5 s, then holds
     warp = Math.Min(1, frame / 125);
     for (i = 0; i < NSTARS; i++) {
@@ -80,15 +84,26 @@ Plymouth.SetRefreshFunction(refresh);
 // ---- saber progress ----
 hilt_img = Image("hilt.png");
 blade_raw = Image("blade.png");
-BAR_W = Math.Min(520, W * 0.4);
-BAR_X = CX - (BAR_W + hilt_img.GetWidth()) / 2;
-BAR_Y = CY + 90;
 hilt = Sprite(hilt_img);
-hilt.SetPosition(BAR_X, BAR_Y, 20);
 blade = Sprite();
 blade.SetZ(20);
+last_progress = 0;
+
+fun layout() {
+    measure();
+    logo_scale = Math.Min(1, (W * 0.38) / logo_raw.GetWidth());
+    global.logo_img = logo_raw.Scale(logo_raw.GetWidth() * logo_scale, logo_raw.GetHeight() * logo_scale);
+    logo.SetImage(logo_img);
+    logo.SetPosition(CX - logo_img.GetWidth() / 2, CY - logo_img.GetHeight() / 2 - 30, 20);
+    global.BAR_W = Math.Min(520, W * 0.4);
+    global.BAR_X = CX - (BAR_W + hilt_img.GetWidth()) / 2;
+    global.BAR_Y = CY + 90;
+    hilt.SetPosition(BAR_X, BAR_Y, 20);
+    blade.SetPosition(BAR_X + hilt_img.GetWidth() - 2, BAR_Y, 20);
+}
 
 fun progress(duration, p) {
+    global.last_progress = p;
     w = Math.Int(BAR_W * p);
     if (w < 2) return;
     blade.SetImage(blade_raw.Scale(w, blade_raw.GetHeight()));
@@ -132,3 +147,5 @@ fun message(text) {
     msg.SetPosition(CX - msg_img.GetWidth() / 2, H - 60, 30);
 }
 Plymouth.SetMessageFunction(message);
+
+layout();
