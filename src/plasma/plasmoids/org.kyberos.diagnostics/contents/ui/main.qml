@@ -66,14 +66,14 @@ PlasmoidItem {
                     PlasmaComponents3.Label {
                         text: modelData.short
                         font.family: root.headFont
-                        font.pixelSize: Math.max(7, Math.round(compact.unit * 0.3))
+                        font.pixelSize: Math.max(9, Math.round(compact.unit * 0.38))
                         font.letterSpacing: 1
                         opacity: 0.75
                         Layout.alignment: Qt.AlignLeft
                     }
                     SegmentBar {
                         segments: 8
-                        segmentWidth: Math.max(3, Math.round(compact.unit * 0.18))
+                        segmentWidth: Math.max(3, Math.round(compact.unit * 0.2))
                         segmentHeight: Math.max(4, Math.round(compact.unit * 0.22))
                         active: root.has(modelData.sensor)
                         value: Math.min(1, (modelData.sensor.value || 0) / modelData.scale)
