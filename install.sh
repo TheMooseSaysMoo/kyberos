@@ -175,6 +175,10 @@ if [ $APPLY = 1 ]; then
             d.writeConfig('Animate', 'true');
         });" >/dev/null 2>&1 || echo "  ! could not set the wallpaper (is plasmashell running?)"
     "$HOME/.local/bin/kyberos-crystal" "$CRYSTAL" --quiet
+    # a running KWin doesn't pick up effects installed after it started, even on reconfigure
+    fx() { gdbus call --session --dest org.kde.KWin --object-path /Effects --method "org.kde.kwin.Effects.$1" "$2" >/dev/null 2>&1 || true; }
+    for e in scale glide fade fadedesktop slide; do fx unloadEffect "$e"; done
+    for e in kyberos_open kyberos_wipe; do fx loadEffect "$e"; done
     # new monitors get the animated wallpaper too
     systemctl --user daemon-reload
     systemctl --user enable --now kyberos-screens.service 2>/dev/null || true
