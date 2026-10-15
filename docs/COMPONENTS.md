@@ -53,3 +53,6 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
   `/usr/lib64/qt6/bin/qmllint` before restarting plasmashell.
 - Testing multi-monitor in the VM: `krfb-virtualmonitor --name Portrait --resolution 1080x1920`
   adds a real KWin output; capture all screens with `spectacle -b -n -f -o file` (via systemd-run).
+- **Scenes can be built at size 0** (the multi-monitor login greeter does this). Any loop that runs "until it fills the width" never ends, eating memory until the OOM killer steps in. `Readout.qml` did this and took SF-Fedora's greeter to 59 GB. Every size-derived loop or count needs a guard and a cap; `main.qml` also holds the scene Loader until it has a size.
+- **Restarting `plasmalogin` straight away races** with the old greeter's compositor shutting down ("transaction is destructive"), leaving no greeter on screen. Use `systemctl stop plasmalogin; sleep 4; systemctl start plasmalogin`.
+- **A running KWin won't load newly installed effects**, even on reconfigure. Call `org.kde.kwin.Effects.loadEffect`.
