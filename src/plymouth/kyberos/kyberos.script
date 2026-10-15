@@ -24,14 +24,15 @@ streaks[1] = Image("streak1.png");
 streaks[2] = Image("streak2.png");
 streaks[3] = Image("streak3.png");
 
+// assignments inside a function are local unless written through global.
 fun spawn(i, near) {
-    star[i].angle = Math.Random() * 2 * Math.Pi;
+    global.star[i].angle = Math.Random() * 2 * Math.Pi;
     if (near)
-        star[i].dist = 8 + Math.Random() * 40;
+        global.star[i].dist = 8 + Math.Random() * 40;
     else
-        star[i].dist = 8 + Math.Random() * MAXD;
-    star[i].speed = 0.55 + Math.Random() * 0.9;
-    star[i].level = -1;
+        global.star[i].dist = 8 + Math.Random() * MAXD;
+    global.star[i].speed = 0.55 + Math.Random() * 0.9;
+    global.star[i].level = -1;
 }
 
 for (i = 0; i < NSTARS; i++) {
