@@ -6,11 +6,16 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
 | Piece | Source | Installs to | Notes |
 |---|---|---|---|
 | Colour schemes ×6 | `build/gen_colors.py` | `color-schemes/KyberOS<Crystal>.colors` | one per kyber crystal |
-| Plasma style | `build/gen_plasma.py` + `svgframe.py` | `plasma/desktoptheme/KyberOS` | uses `ColorScheme-*` classes, so it follows the crystal |
+| Plasma style | `build/gen_plasma.py` + `svgframe.py` | `plasma/desktoptheme/KyberOS` | follows the crystal via `ColorScheme-*` classes; shadows, translucent (blur) variants, sliders, scrollbars, diamond radios, switch, tabs |
 | Window decoration ×6 | `build/gen_aurorae.py` | `aurorae/themes/KyberOS-<Crystal>` | Aurorae can't follow colour schemes, hence 6 variants |
 | Konsole | `build/gen_konsole.py` | `konsole/` | phosphor-on-void, Share Tech Mono |
 | Static wallpapers ×6 | `build/gen_wallpaper.py` | `wallpapers/KyberOS-<Crystal>` | 4K, also the animated plugin's base art |
-| Animated wallpaper | `src/plasma/wallpapers/org.kyberos.tactical` | `plasma/wallpapers/` | radar sweep, orbit contact, LEDs, scan band, optional banner; used on desktop, lock screen and login greeter |
+| Animated wallpaper | `src/plasma/wallpapers/org.kyberos.tactical` | `plasma/wallpapers/` | four responsive QML scenes (Tactical, Schematic, Targeting, Comms); `Scene=auto` picks per monitor: landscape → Tactical, portrait left of centre → Targeting, right → Comms; override per monitor in wallpaper settings. Also lock screen + greeter (banner) |
+| New-monitor watcher | `kyberos-screens` + `system/kyberos-screens.service` | `~/.local/bin`, user unit | Plasma gives new screens the stock image plugin; this switches them to the animated one (leaves custom wallpapers alone) |
+| App widgets (Kvantum) ×6 | `build/gen_kvantum.py` | `~/.config/Kvantum/KyberOS-<Crystal>` | chamfered controls, diamond radios, saber progress bars; `widgetStyle=kvantum` |
+| Alt+Tab switcher | `src/kwin/tabbox/kyberos` | `kwin/tabbox/` | "SELECT TARGET" thumbnails with lock brackets |
+| Logout screen | `src/plasma/look-and-feel/.../logout` | (in global theme) | "POWER SYSTEMS" restyle of Breeze's logout |
+| Terminal greeting | `kyberos-greeting` | `~/.local/bin` | run by the KyberOS Konsole profile |
 | Icons | `build/gen_icons.py` | `icons/KyberOS` | places + a few apps, inherits Breeze Dark, follows colour scheme |
 | Cursors ×6 | `build/gen_cursors.py` | `icons/KyberOS-<Crystal>/cursors` | needs rsvg-convert + xcursorgen |
 | Sounds | `build/gen_sounds.py` | `sounds/KyberOS` | synthesised WAVs, no film audio |
@@ -41,3 +46,10 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
   script uses its own PRNG and pre-rotated streak PNGs. Variables first assigned inside a
   function are local unless written through `global.`.
 - `console=ttyS0` on the kernel command line forces Plymouth into text mode.
+- Animators (XAnimator/ScaleAnimator...) fix from/to when they start: base sizes on `Screen`, not a
+  window that may still be growing (the splash bunched up in a 150 px ball until this was fixed).
+- QML gotchas hit here: a property named `data` (Item default property), upper-case method names,
+  and `parent` inside a `ShapePath` (it is not the Shape) all break silently or at load. Run
+  `/usr/lib64/qt6/bin/qmllint` before restarting plasmashell.
+- Testing multi-monitor in the VM: `krfb-virtualmonitor --name Portrait --resolution 1080x1920`
+  adds a real KWin output; capture all screens with `spectacle -b -n -f -o file` (via systemd-run).
