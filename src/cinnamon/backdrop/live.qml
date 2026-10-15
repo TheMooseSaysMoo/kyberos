@@ -9,16 +9,20 @@ import QtQuick
 import QtQuick.Window
 import "ui"
 
-QtObject {
+// the qml runtime wants a window as root: an invisible one that owns the per-monitor windows
+Window {
     id: app
+    visible: false
+    width: 1; height: 1
     readonly property string crystal: Qt.application.arguments[Qt.application.arguments.length - 1]
     readonly property int desktopWidth: {
         let w = 0
-        for (const s of Qt.application.screens) w = Math.max(w, s.virtualX + s.width)
+        const ss = Qt.application.screens          // a QML list: not iterable with for..of on Qt 6.4
+        for (let i = 0; i < ss.length; i++) w = Math.max(w, ss[i].virtualX + ss[i].width)
         return w
     }
 
-    property Instantiator windows: Instantiator {
+    Instantiator {
         model: Qt.application.screens
         delegate: Window {
             required property var modelData
@@ -27,7 +31,8 @@ QtObject {
             width: modelData.width; height: modelData.height
             title: "kyberos-live"
             color: "#06080b"
-            flags: Qt.Desktop | Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint | Qt.WindowDoesNotAcceptFocus
+            // (kyberos-live marks these _NET_WM_WINDOW_TYPE_DESKTOP once mapped: Qt.Desktop windows never show)
+            flags: Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint | Qt.WindowDoesNotAcceptFocus
             visible: true
             Backdrop {
                 anchors.fill: parent

@@ -18,7 +18,7 @@ case ${1:-run} in
 on)
     mkdir -p "$(dirname "$AUTO")"
     cp "$DATA/kyberos/autostart/kyberos-live.desktop" "$AUTO"
-    pgrep -f "kyberos/backdrop/live.qml" >/dev/null || setsid "$0" run >/dev/null 2>&1 &
+    pgrep -f "kyberos/backdrop/live.qml" >/dev/null || setsid "$0" run </dev/null >/dev/null 2>&1 &
     echo "live backdrop on"
     ;;
 off)
@@ -32,13 +32,32 @@ run)
     q=$(qml_bin) || { echo "qml runtime not found" >&2; exit 1; }
     "$q" "$DATA/kyberos/backdrop/live.qml" -- "$crystal" &
     pid=$!
-    # the desktop icons (nemo-desktop) must sit above us: once our windows are mapped,
-    # restart nemo-desktop so it maps last
-    sleep 3
-    if pgrep -x nemo-desktop >/dev/null; then
-        pkill -x nemo-desktop; sleep 1
-        setsid nemo-desktop >/dev/null 2>&1 &
-    fi
+    # turn our windows into desktop-layer windows (bottom of the stack, no taskbar entry)
+    for _ in $(seq 1 20); do
+        ids=$(xwininfo -root -tree 2>/dev/null | awk '/"kyberos-live"/ {print $1}')
+        [ -n "$ids" ] && break
+        sleep 0.5
+    done
+    for id in $ids; do
+        xprop -id "$id" -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_DESKTOP
+    done
+    # nemo-desktop refuses to run while another desktop window exists unless that window's
+    # class is in its ignore list; then (re)start it so it maps last, above us
+    cur=$(gsettings get org.nemo.desktop ignored-desktop-handlers 2>/dev/null || echo "@as []")
+    case $cur in
+        *"'Qml Runtime'"*) ;;
+        "@as []"|"[]") gsettings set org.nemo.desktop ignored-desktop-handlers "['qml', 'Qml Runtime']" ;;
+        *) gsettings set org.nemo.desktop ignored-desktop-handlers "${cur%]}, 'qml', 'Qml Runtime']" ;;
+    esac
+    pkill -x nemo-desktop; sleep 1
+    setsid nemo-desktop </dev/null >/dev/null 2>&1 &
+    # and lift its window above ours (both are desktop-layer windows)
+    for _ in $(seq 1 20); do
+        nid=$(for w in $(xprop -root _NET_CLIENT_LIST | grep -o "0x[0-9a-f]*"); do
+                  xprop -id "$w" WM_CLASS 2>/dev/null | grep -q '"Nemo-desktop"' && echo "$w"; done | head -1)
+        [ -n "$nid" ] && { xdotool windowraise "$nid" 2>/dev/null || true; break; }
+        sleep 0.5
+    done
     wait $pid
     ;;
 *)
