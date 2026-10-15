@@ -28,6 +28,7 @@ Window {
             Backdrop {
                 x: modelData.x; y: modelData.y
                 width: modelData.w; height: modelData.h
+                clip: true             // scenes may draw past their edges (each is its own window on Plasma)
                 scene: modelData.scene
                 crystal: win.args[3]
                 animate: true          // let the scene settle into a representative frame
