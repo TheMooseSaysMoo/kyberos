@@ -94,9 +94,10 @@ for sub in color-schemes aurorae konsole wallpapers icons sounds; do
 done
 mkdir -p "$CONF/Kvantum"
 cp -r "$DIST/Kvantum/." "$CONF/Kvantum/"
-mkdir -p "$DATA/plasma" "$DATA/kwin/effects"
+mkdir -p "$DATA/plasma" "$DATA/kwin/effects" "$DATA/kwin/tabbox"
 cp -r "$DIST/plasma/." "$DATA/plasma/"
 cp -r "$DIST/kwin/effects/." "$DATA/kwin/effects/"
+cp -r "$DIST/kwin/tabbox/." "$DATA/kwin/tabbox/"
 mkdir -p "$HOME/.local/bin"
 install -m 755 "$HERE/kyberos-crystal" "$HOME/.local/bin/kyberos-crystal"
 install -m 755 "$HERE/kyberos-screens" "$HOME/.local/bin/kyberos-screens"
@@ -139,6 +140,8 @@ if [ $APPLY = 1 ]; then
     for e in scale glide fade fadedesktop slide; do
         w --file kwinrc --group Plugins --key "${e}Enabled" false
     done
+    # Alt+Tab: targeting console switcher
+    w --file kwinrc --group TabBox --key LayoutName kyberos
     # lock screen: tactical wallpaper with a banner
     w --file kscreenlockerrc --group Greeter --key WallpaperPlugin org.kyberos.tactical
     w --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kyberos.tactical --group General --key Banner "AUTHORIZATION REQUIRED"

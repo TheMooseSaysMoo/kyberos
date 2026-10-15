@@ -1,0 +1,11 @@
+{
+    "KPackageStructure": "KWin/WindowSwitcher",
+    "KPlugin": {
+        "Authors": [{ "Name": "KyberOS" }],
+        "Description": "Targeting console window switcher: thumbnails with lock brackets",
+        "Id": "kyberos",
+        "License": "GPL-3.0-or-later",
+        "Name": "KyberOS Targeting"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
