@@ -6,7 +6,8 @@
 #   kyb_installed <pkg>    is the package installed
 #   kyb_install <pkg>...   install packages (run as root)
 #   kyb_packages           sorted list of installed package names
-#   kyb_dm                 active display manager: plasmalogin | sddm | <other> | ""
+#   kyb_dm                 active display manager: plasmalogin | sddm | lightdm | <other> | ""
+#   kyb_desktop            plasma | cinnamon | unknown (KYBEROS_DESKTOP overrides)
 #   kyb_plymouth_set <t>   set the boot splash theme and rebuild the initramfs (root)
 
 kyb_family() {
@@ -40,6 +41,12 @@ kyb_pkg() {
             fedora:shapes) echo qt6-qtdeclarative ;; debian:shapes) echo qml6-module-qtquick-shapes ;; arch:shapes) echo qt6-declarative ;;
             fedora:gdbus) echo glib2 ;;             debian:gdbus) echo libglib2.0-bin ;;   arch:gdbus) echo glib2 ;;
             fedora:python) echo python3 ;;          debian:python) echo python3 ;;         arch:python) echo python ;;
+            # Cinnamon side: the qml runtime + modules (scene renders), xrandr, dconf
+            fedora:qml) echo qt6-qtdeclarative-devel ;;
+            debian:qml) echo qt6-declarative-dev-tools qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
+            arch:qml) echo qt6-declarative ;;
+            fedora:xrandr) echo xrandr ;;           debian:xrandr) echo x11-xserver-utils ;; arch:xrandr) echo xorg-xrandr ;;
+            fedora:dconf) echo dconf ;;             debian:dconf) echo dconf-cli ;;         arch:dconf) echo dconf ;;
             *:zstd) echo zstd ;; *:curl) echo curl ;; *:fontconfig) echo fontconfig ;;
             *) echo "kyb_pkg: no package for '$d' on '$KYB_FAMILY'" >&2 ;;
         esac
@@ -80,9 +87,23 @@ kyb_dm() {
     u=$(basename "$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null)" .service 2>/dev/null)
     if [ -z "$u" ] || [ "$u" = display-manager ]; then
         u=""
-        for d in plasmalogin sddm; do systemctl is-enabled -q "$d" 2>/dev/null && { u=$d; break; }; done
+        for d in plasmalogin sddm lightdm; do systemctl is-enabled -q "$d" 2>/dev/null && { u=$d; break; }; done
     fi
     echo "$u"
+}
+
+kyb_desktop() {
+    [ -n "${KYBEROS_DESKTOP:-}" ] && { echo "$KYBEROS_DESKTOP"; return; }
+    case "${XDG_CURRENT_DESKTOP:-}" in
+        *KDE*|*Plasma*) echo plasma; return ;;
+        *Cinnamon*) echo cinnamon; return ;;
+    esac
+    # over ssh / from a tty: look at what is running, then at what is installed
+    if pgrep -u "$(id -u)" -x plasmashell >/dev/null; then echo plasma
+    elif pgrep -u "$(id -u)" -x cinnamon >/dev/null; then echo cinnamon
+    elif command -v plasmashell >/dev/null; then echo plasma
+    elif command -v cinnamon >/dev/null; then echo cinnamon
+    else echo unknown; fi
 }
 
 kyb_initramfs() {

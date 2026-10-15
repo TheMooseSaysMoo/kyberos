@@ -133,7 +133,7 @@ def generate(out):
     (base / "index.theme").write_text("""[Icon Theme]
 Name=KyberOS
 Comment=Imperial console icons (inherits Breeze Dark)
-Inherits=breeze-dark,breeze,hicolor
+Inherits=breeze-dark,breeze,Mint-Y-Dark,Mint-Y,Papirus-Dark,Adwaita,hicolor
 DisplayDepth=32
 Directories=scalable/places,scalable/apps
 FollowsColorScheme=true

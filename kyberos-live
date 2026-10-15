@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# KyberOS live backdrop for Cinnamon (opt-in, experimental): runs the animated scenes in a
+# desktop-layer window on every monitor, under the desktop icons.
+#   kyberos-live on|off     enable/disable (autostart entry + start/stop now)
+#   kyberos-live run        what the autostart entry runs
+set -uo pipefail
+DATA=${XDG_DATA_HOME:-$HOME/.local/share}
+AUTO=${XDG_CONFIG_HOME:-$HOME/.config}/autostart/kyberos-live.desktop
+
+qml_bin() {
+    for q in /usr/lib/qt6/bin/qml /usr/lib64/qt6/bin/qml /usr/bin/qml6 /usr/lib/x86_64-linux-gnu/qt6/bin/qml; do
+        [ -x "$q" ] && { echo "$q"; return; }
+    done
+    command -v qml
+}
+
+case ${1:-run} in
+on)
+    mkdir -p "$(dirname "$AUTO")"
+    cp "$DATA/kyberos/autostart/kyberos-live.desktop" "$AUTO"
+    pgrep -f "kyberos/backdrop/live.qml" >/dev/null || setsid "$0" run >/dev/null 2>&1 &
+    echo "live backdrop on"
+    ;;
+off)
+    rm -f "$AUTO"
+    pkill -f "kyberos/backdrop/live.qml"
+    pkill -f "kyberos-live run"
+    echo "live backdrop off"
+    ;;
+run)
+    crystal=$(cat "$DATA/kyberos/crystal" 2>/dev/null || echo blue)
+    q=$(qml_bin) || { echo "qml runtime not found" >&2; exit 1; }
+    "$q" "$DATA/kyberos/backdrop/live.qml" -- "$crystal" &
+    pid=$!
+    # the desktop icons (nemo-desktop) must sit above us: once our windows are mapped,
+    # restart nemo-desktop so it maps last
+    sleep 3
+    if pgrep -x nemo-desktop >/dev/null; then
+        pkill -x nemo-desktop; sleep 1
+        setsid nemo-desktop >/dev/null 2>&1 &
+    fi
+    wait $pid
+    ;;
+*)
+    echo "usage: kyberos-live on|off" >&2; exit 2 ;;
+esac

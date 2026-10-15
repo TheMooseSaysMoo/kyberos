@@ -24,6 +24,11 @@ rm -f "$LOCAL"/color-schemes/KyberOS*.colors
 # SDDM
 rm -f /etc/sddm.conf.d/50-kyberos.conf
 rm -rf /usr/share/sddm/themes/kyberos
+# LightDM
+if [ -f "$STATE/slick-greeter.conf.pre-kyberos" ]; then cp -a "$STATE/slick-greeter.conf.pre-kyberos" /etc/lightdm/slick-greeter.conf
+elif [ -f "$STATE/slick-greeter.conf.absent" ]; then rm -f /etc/lightdm/slick-greeter.conf; fi
+rm -f /etc/lightdm/lightdm-gtk-greeter.conf.d/50-kyberos.conf
+rm -rf /usr/local/share/kyberos /usr/share/themes/KyberOS-* /usr/share/icons/KyberOS
 # shared
 rm -rf "$LOCAL/fonts/kyberos" "$LOCAL"/icons/KyberOS-* /usr/share/icons/KyberOS-*
 rm -rf "$STATE"

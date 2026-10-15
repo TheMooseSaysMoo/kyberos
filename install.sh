@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# KyberOS installer (Plasma 6 on Fedora, Debian/Ubuntu or Arch).
+# KyberOS installer: KDE Plasma 6 or Cinnamon, on Fedora, Debian/Ubuntu or Arch.
 #
 #   ./install.sh                  build + install for this user, apply theme, keep panels
 #   ./install.sh --layout         ...and replace the panel layout with the KyberOS one (pinned apps kept)
 #   ./install.sh --crystal red    pick the kyber crystal (blue green red purple yellow white)
 #   ./install.sh --system         also install the boot splash + login greeter theme (sudo)
+#   ./install.sh --live           Cinnamon: also run the animated live backdrop (experimental)
+#   ./install.sh --desktop X      force plasma|cinnamon instead of detecting it
 #   ./install.sh --no-apply       install files only
 #
 # Every config file it touches is backed up once to ~/.local/share/kyberos/backup-original
@@ -20,14 +22,17 @@ CRYSTAL=blue
 LAYOUT=0
 SYSTEM=0
 APPLY=1
+LIVE=0
 
 while [ $# -gt 0 ]; do
     case $1 in
         --layout) LAYOUT=1 ;;
         --system) SYSTEM=1 ;;
         --no-apply) APPLY=0 ;;
+        --live) LIVE=1 ;;
+        --desktop) export KYBEROS_DESKTOP=$2; shift ;;
         --crystal) CRYSTAL=$2; shift ;;
-        -h|--help) sed -n 2,12p "$0"; exit 0 ;;
+        -h|--help) sed -n 2,14p "$0"; exit 0 ;;
         *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
     shift
@@ -38,20 +43,33 @@ Cap=${CRYSTAL^}
 say() { printf '\033[1;36m[kyberos]\033[0m %s\n' "$*"; }
 
 # ---- dependencies ------------------------------------------------------
-if ! command -v kpackagetool6 >/dev/null || ! command -v plasma-apply-lookandfeel >/dev/null; then
-    echo "KyberOS needs KDE Plasma 6 (kpackagetool6 / plasma-apply-lookandfeel not found)." >&2
-    exit 1
-fi
-[ "$KYB_FAMILY" = unknown ] && echo "  ! unrecognised distro: install librsvg (rsvg-convert), xcursorgen, kwriteconfig6, Kvantum (Qt6) and the QtQuick.Shapes QML module yourself" >&2
+DESKTOP=$(kyb_desktop)
+case $DESKTOP in
+    plasma)
+        if ! command -v kpackagetool6 >/dev/null || ! command -v plasma-apply-lookandfeel >/dev/null; then
+            echo "KyberOS needs KDE Plasma 6 (kpackagetool6 / plasma-apply-lookandfeel not found)." >&2
+            exit 1
+        fi ;;
+    cinnamon) ;;
+    *) echo "KyberOS supports KDE Plasma 6 and Cinnamon; neither was found (use --desktop to force)." >&2; exit 1 ;;
+esac
+say "desktop: $DESKTOP, distro family: $KYB_FAMILY"
+[ "$KYB_FAMILY" = unknown ] && echo "  ! unrecognised distro: install librsvg (rsvg-convert), xcursorgen and the build tools listed in lib/distro.sh yourself" >&2
 need=()
 command -v rsvg-convert >/dev/null || need+=($(kyb_pkg rsvg))
 command -v xcursorgen >/dev/null || need+=($(kyb_pkg xcursorgen))
-command -v kwriteconfig6 >/dev/null || need+=($(kyb_pkg kconfig))
 command -v gdbus >/dev/null || need+=($(kyb_pkg gdbus))
 command -v python3 >/dev/null || need+=($(kyb_pkg python))
 command -v curl >/dev/null || need+=($(kyb_pkg curl))
 command -v fc-cache >/dev/null || need+=($(kyb_pkg fontconfig))
-for d in kvantum shapes; do kyb_installed "$(kyb_pkg $d)" || need+=($(kyb_pkg $d)); done
+if [ "$DESKTOP" = plasma ]; then
+    command -v kwriteconfig6 >/dev/null || need+=($(kyb_pkg kconfig))
+    for d in kvantum shapes; do kyb_installed "$(kyb_pkg $d)" || need+=($(kyb_pkg $d)); done
+else
+    command -v xrandr >/dev/null || need+=($(kyb_pkg xrandr))
+    command -v dconf >/dev/null || need+=($(kyb_pkg dconf))
+    for p in $(kyb_pkg qml); do kyb_installed "$p" || need+=("$p"); done
+fi
 if [ ${#need[@]} -gt 0 ] && [ "$KYB_FAMILY" != unknown ]; then
     say "installing: ${need[*]} ($KYB_FAMILY, sudo)"
     sudo bash -c ". '$HERE/lib/distro.sh'; kyb_install ${need[*]}"
@@ -83,6 +101,25 @@ say "building assets"
 KYBEROS_CRYSTAL=$CRYSTAL python3 "$HERE/build/build.py" "$HERE/dist" | sed 's/^/  /'
 DIST=$HERE/dist
 
+finish() {
+    if [ $SYSTEM = 1 ]; then
+        say "installing system pieces (sudo): boot splash + login greeter"
+        sudo "$HERE/system/install-system.sh" "$DIST" "$CRYSTAL"
+    fi
+    local cmd=kyberos-crystal
+    case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) cmd="~/.local/bin/kyberos-crystal" ;; esac   # not on PATH on Arch by default
+    say "done. Crystal: $Cap. Switch any time with: $cmd <blue|green|red|purple|yellow|white>"
+}
+
+# ---- Cinnamon ------------------------------------------------------------
+if [ "$DESKTOP" = cinnamon ]; then
+    . "$HERE/lib/install-cinnamon.sh"
+    cinnamon_install
+    finish
+    exit 0
+fi
+
+# ---- Plasma --------------------------------------------------------------
 # ---- back up config once -------------------------------------------------
 BACKUP=$STATE/backup-original
 CONFIGS=(kdeglobals kwinrc plasmarc kcminputrc ksplashrc kscreenlockerrc konsolerc
@@ -201,12 +238,4 @@ if [ $APPLY = 1 ]; then
     systemctl --user restart plasma-plasmashell.service 2>/dev/null || true
 fi
 
-# ---- system pieces (sudo) -------------------------------------------------
-if [ $SYSTEM = 1 ]; then
-    say "installing system pieces (sudo): boot splash + login greeter"
-    sudo "$HERE/system/install-system.sh" "$DIST" "$CRYSTAL"
-fi
-
-cmd=kyberos-crystal
-case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) cmd="~/.local/bin/kyberos-crystal" ;; esac   # not on PATH on Arch by default
-say "done. Crystal: $Cap. Switch any time with: $cmd <blue|green|red|purple|yellow|white>"
+finish

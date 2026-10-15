@@ -5,6 +5,7 @@
 #   - login screen, for whichever display manager is active:
 #       Plasma Login Manager -> tactical wallpaper + KyberOS style/colours/cursor/fonts
 #       SDDM                 -> the 'kyberos' SDDM theme (same animated display + IDENTIFY panel)
+#       LightDM              -> slick-greeter / lightdm-gtk-greeter: KyberOS GTK theme + tactical background
 # Fedora, Debian/Ubuntu and Arch. Package-managed files are never overwritten: assets go
 # under /usr/local/share, /usr/share/{plymouth/themes,sddm/themes,icons}/<kyberos dirs>
 # and config drop-ins. Undo with system/uninstall-system.sh.
@@ -104,7 +105,70 @@ sddm)
         say "SDDM themed (applies at next logout/boot; preview: sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/kyberos)"
     fi
     ;;
+lightdm)
+    # greeter assets: GTK theme + a rendered tactical background (as the desktop user, offscreen)
+    G=/usr/local/share/kyberos
+    install -d "$G"
+    rm -rf "/usr/share/themes/KyberOS-$Cap"
+    [ -d "$DIST/themes/KyberOS-$Cap" ] && cp -r "$DIST/themes/KyberOS-$Cap" /usr/share/themes/
+    rm -rf /usr/share/icons/KyberOS
+    [ -d "$DIST/icons/KyberOS" ] && cp -r "$DIST/icons/KyberOS" /usr/share/icons/
+    bg=$G/login-$CRYSTAL.png
+    q=$(ls /usr/lib/qt6/bin/qml /usr/lib64/qt6/bin/qml /usr/bin/qml6 2>/dev/null | head -1 || true)
+    if [ -n "$q" ] && [ -f "$DIST/cinnamon/backdrop/span.qml" ]; then
+        tmp=$(sudo -u "${SUDO_USER:-root}" mktemp --suffix=.png)
+        sudo -u "${SUDO_USER:-root}" env QT_QPA_PLATFORM=offscreen "$q" "$DIST/cinnamon/backdrop/span.qml" -- \
+            "$tmp" 2560 1440 "$CRYSTAL" "0,0,2560,1440,tactical" >/dev/null 2>&1 && install -m 644 "$tmp" "$bg"
+        rm -f "$tmp"
+    fi
+    if [ ! -s "$bg" ]; then
+        still=$(ls -S "$DIST/wallpapers/KyberOS-$Cap/contents/images/"*.png 2>/dev/null | head -1 || true)
+        [ -n "$still" ] && install -m 644 "$still" "$bg"
+    fi
+    chmod -R a+rX "$G" "/usr/share/themes/KyberOS-$Cap" /usr/share/icons/KyberOS 2>/dev/null || true
+    greeter=$(grep -rhs "^greeter-session" /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.d /usr/share/lightdm/lightdm.conf.d | tail -1 | cut -d= -f2)
+    case $greeter in
+    *slick*|"")
+        # slick-greeter reads a single file; keep the original to put back
+        f=/etc/lightdm/slick-greeter.conf
+        [ -f "$f" ] && [ ! -f "$STATE/slick-greeter.conf.pre-kyberos" ] && cp -a "$f" "$STATE/slick-greeter.conf.pre-kyberos"
+        [ -f "$f" ] || touch "$STATE/slick-greeter.conf.absent"
+        cat > "$f" <<KYB
+# KyberOS login screen (system/install-system.sh); the original is kept in $STATE
+[Greeter]
+background=$bg
+background-color=#06080b
+draw-user-backgrounds=false
+draw-grid=false
+theme-name=KyberOS-$Cap
+icon-theme-name=KyberOS
+cursor-theme-name=KyberOS-$Cap
+cursor-theme-size=24
+font-name=Exo 2 11
+show-hostname=true
+clock-format=%H:%M
+KYB
+        say "slick-greeter themed (applies at next logout/boot)"
+        ;;
+    *gtk*)
+        install -d /etc/lightdm/lightdm-gtk-greeter.conf.d
+        cat > /etc/lightdm/lightdm-gtk-greeter.conf.d/50-kyberos.conf <<KYB
+[greeter]
+background=$bg
+theme-name=KyberOS-$Cap
+icon-theme-name=KyberOS
+cursor-theme-name=KyberOS-$Cap
+font-name=Exo 2 11
+clock-format=%H:%M
+KYB
+        say "lightdm-gtk-greeter themed (applies at next logout/boot)"
+        ;;
+    *)
+        say "LightDM greeter '$greeter' isn't slick-greeter or lightdm-gtk-greeter: skipping the login theme"
+        ;;
+    esac
+    ;;
 *)
-    say "display manager '${DM:-none}' isn't SDDM or Plasma Login Manager: skipping the login theme"
+    say "display manager '${DM:-none}' isn't SDDM, Plasma Login Manager or LightDM: skipping the login theme"
     ;;
 esac

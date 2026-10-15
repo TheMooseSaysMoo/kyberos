@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# KyberOS per-monitor wallpaper for Cinnamon: every monitor gets its own scene, rendered at
+# its exact size into one image laid out like the desktop, set as a "spanned" background.
+#   kyberos-wallpaper            render + apply once
+#   kyberos-wallpaper --watch    re-render whenever monitors or the crystal change (user service)
+# Scene per monitor: landscape -> tactical; portrait left of centre -> targeting, right -> comms.
+# Pin one in ~/.config/kyberos/scenes.conf, e.g.  DP-2=schematic
+set -uo pipefail
+
+DATA=${XDG_DATA_HOME:-$HOME/.local/share}
+CONF=${XDG_CONFIG_HOME:-$HOME/.config}
+BACKDROP=$DATA/kyberos/backdrop
+OUTDIR=$DATA/kyberos/wallpaper
+SCENES=$CONF/kyberos/scenes.conf
+
+qml_bin() {
+    for q in /usr/lib/qt6/bin/qml /usr/lib64/qt6/bin/qml /usr/bin/qml6 /usr/lib/x86_64-linux-gnu/qt6/bin/qml; do
+        [ -x "$q" ] && { echo "$q"; return; }
+    done
+    command -v qml
+}
+
+layout() { xrandr --listmonitors 2>/dev/null | tail -n +2; }
+
+render() {
+    local crystal monitors total_w=0 total_h=0 spec=() name geo w h x y scene
+    crystal=$(cat "$DATA/kyberos/crystal" 2>/dev/null || echo blue)
+    monitors=$(layout)
+    [ -n "$monitors" ] || { echo "no monitors from xrandr" >&2; return 1; }
+    # " 0: +*DP-2 3440/800x1440/335+1440+754  DP-2"
+    while read -r _ _ geo name; do
+        w=${geo%%/*}; h=${geo#*x}; h=${h%%/*}
+        x=${geo#*+}; x=${x%%+*}; y=${geo##*+}
+        total_w=$(( x + w > total_w ? x + w : total_w ))
+        total_h=$(( y + h > total_h ? y + h : total_h ))
+    done <<< "$monitors"
+    while read -r _ _ geo name; do
+        w=${geo%%/*}; h=${geo#*x}; h=${h%%/*}
+        x=${geo#*+}; x=${x%%+*}; y=${geo##*+}
+        scene=$(grep -s "^$name=" "$SCENES" | cut -d= -f2)
+        if [ -z "$scene" ] || [ "$scene" = auto ]; then
+            if [ $(( h * 10 )) -gt $(( w * 11 )) ]; then
+                [ $(( (x + w / 2) * 2 )) -lt "$total_w" ] && scene=targeting || scene=comms
+            else
+                scene=tactical
+            fi
+        fi
+        spec+=("$x,$y,$w,$h,$scene")
+    done <<< "$monitors"
+
+    mkdir -p "$OUTDIR"
+    local key out tmp q
+    key=$(printf '%s %s %s' "$crystal" "${spec[*]}" "$(cat "$SCENES" 2>/dev/null)" | md5sum | cut -c1-10)
+    out=$OUTDIR/kyberos-$key.png
+    if [ ! -s "$out" ]; then
+        q=$(qml_bin) || { echo "qml runtime not found" >&2; return 1; }
+        tmp=$out.tmp.png
+        QT_QPA_PLATFORM=offscreen "$q" "$BACKDROP/span.qml" -- "$tmp" "$total_w" "$total_h" "$crystal" "${spec[@]}" \
+            >/dev/null 2>&1 && mv "$tmp" "$out" || { rm -f "$tmp"; echo "render failed" >&2; return 1; }
+    fi
+    gsettings set org.cinnamon.desktop.background picture-uri "file://$out"
+    gsettings set org.cinnamon.desktop.background picture-options spanned
+    # keep the newest few renders only
+    ls -1t "$OUTDIR"/kyberos-*.png 2>/dev/null | tail -n +4 | xargs -r rm -f
+    echo "$out"
+}
+
+if [ "${1:-}" = --watch ]; then
+    last=""
+    while true; do
+        now=$(printf '%s|%s|%s' "$(layout)" "$(cat "$DATA/kyberos/crystal" 2>/dev/null)" "$(cat "$SCENES" 2>/dev/null)" | md5sum)
+        [ "$now" != "$last" ] && render >/dev/null && last=$now
+        sleep 5
+    done
+else
+    render
+fi

@@ -40,10 +40,15 @@ DESKTOP=(
     .local/share/konsole .local/share/wallpapers .local/share/icons .local/share/sounds
     .local/share/fonts .local/share/kscreen .local/share/plasmashell
     .local/bin/kyberos-crystal .local/bin/kyberos-screens .local/bin/kyberos-greeting
+    .local/bin/kyberos-wallpaper .local/bin/kyberos-live
+    .config/cinnamon .local/share/themes .local/share/cinnamon
+    .config/autostart/kyberos-wallpaper.desktop .config/autostart/kyberos-live.desktop
     .local/share/kyberos
 )
 
 systemctl --user disable --now kyberos-screens.service 2>/dev/null || true
+pkill -f "kyberos-wallpaper --watch" 2>/dev/null || true
+pkill -f "kyberos/backdrop/live.qml" 2>/dev/null || true
 
 ASIDE=$SNAP/replaced-$(date +%Y%m%d-%H%M%S)
 say "moving the current desktop files aside -> $ASIDE"
@@ -66,6 +71,20 @@ fi
 
 fc-cache -f >/dev/null 2>&1 || true
 kbuildsycoca6 >/dev/null 2>&1 || true
+
+# Cinnamon/GNOME settings live in dconf: load the dumps taken with the snapshot
+if command -v dconf >/dev/null && ls "$SNAP"/state/dconf-*.ini >/dev/null 2>&1; then
+    cp=$(pgrep -u "$(id -u)" -x cinnamon | head -1 || true)
+    [ -n "$cp" ] && while IFS= read -r -d '' kv; do
+        case ${kv%%=*} in DISPLAY|XAUTHORITY|DBUS_SESSION_BUS_ADDRESS) export "$kv" ;; esac
+    done < "/proc/$cp/environ"
+    for f in "$SNAP"/state/dconf-*.ini; do
+        tree=$(basename "$f" .ini); tree=${tree#dconf-}; tree=/org/${tree//-//}/
+        [ -s "$f" ] || continue
+        dconf reset -f "$tree" && dconf load "$tree" < "$f"
+    done
+    say "restored dconf settings (Cinnamon, terminal, interface, Nemo)"
+fi
 systemctl --user daemon-reload
 
 if [ $SYSTEM = 1 ]; then

@@ -80,6 +80,13 @@ gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
     | python3 -c 'import ast, sys; print(ast.literal_eval(sys.stdin.read())[0])' > "$OUT/state/plasma-layout.json" 2>/dev/null \
     || echo "plasmashell not reachable" > "$OUT/state/plasma-layout.json"
 
+# Cinnamon/GNOME keep their settings in dconf, not files: dump the relevant trees
+if command -v dconf >/dev/null; then
+    for tree in cinnamon gnome/terminal gnome/desktop/interface nemo; do
+        dconf dump "/org/$tree/" > "$OUT/state/dconf-${tree//\//-}.ini" 2>/dev/null
+    done
+    xrandr --listmonitors > "$OUT/state/monitors.txt" 2>/dev/null
+fi
 kscreen-doctor -o 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' > "$OUT/state/screens.txt"
 systemctl --user list-unit-files --state=enabled --no-legend > "$OUT/state/user-units.txt" 2>/dev/null
 for t in Plasma/LookAndFeel Plasma/Theme Plasma/Wallpaper Plasma/Applet KWin/Effect KWin/WindowSwitcher; do

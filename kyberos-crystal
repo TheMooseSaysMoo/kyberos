@@ -14,6 +14,44 @@ if [ -z "$crystal" ] || [ -z "${HEX[$crystal]:-}" ]; then
 fi
 Cap=${crystal^}
 hex=${HEX[$crystal]}
+DATA=${XDG_DATA_HOME:-$HOME/.local/share}
+mkdir -p "$DATA/kyberos"
+echo "$crystal" > "$DATA/kyberos/crystal"
+
+# ---- Cinnamon ----
+desktop=${KYBEROS_DESKTOP:-}
+[ -n "$desktop" ] || case "${XDG_CURRENT_DESKTOP:-}" in *Cinnamon*) desktop=cinnamon ;; *KDE*|*Plasma*) desktop=plasma ;; esac
+[ -n "$desktop" ] || { pgrep -u "$(id -u)" -x cinnamon >/dev/null && desktop=cinnamon || desktop=plasma; }
+if [ "$desktop" = cinnamon ]; then
+    cp=$(pgrep -u "$(id -u)" -x cinnamon | head -1 || true)
+    [ -n "$cp" ] && while IFS= read -r -d '' kv; do
+        name=${kv%%=*}
+        case $name in DISPLAY|XAUTHORITY|DBUS_SESSION_BUS_ADDRESS) [ -z "${!name:-}" ] && export "$kv" ;; esac
+    done < "/proc/$cp/environ"
+    gsettings set org.cinnamon.desktop.interface gtk-theme "KyberOS-$Cap"
+    gsettings set org.cinnamon.desktop.wm.preferences theme "KyberOS-$Cap"
+    gsettings set org.cinnamon.theme name "KyberOS-$Cap"
+    gsettings set org.cinnamon.desktop.interface cursor-theme "KyberOS-$Cap"
+    gsettings set org.gnome.desktop.interface cursor-theme "KyberOS-$Cap" 2>/dev/null || true
+    # GTK 4 / libadwaita overrides follow the crystal
+    g=${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0
+    for f in gtk.css gtk-dark.css assets; do
+        [ -L "$g/$f" ] && ln -sfn "$DATA/themes/KyberOS-$Cap/gtk-4.0/$f" "$g/$f"
+    done
+    # terminal palette
+    uuid=$(gsettings get org.gnome.Terminal.ProfilesList list 2>/dev/null | grep -o "6b796265-726f-4f53-8000-00000000000a" || true)
+    f=$DATA/kyberos/gnome-terminal/KyberOS$Cap.dconf
+    [ -n "$uuid" ] && [ -f "$f" ] && dconf load "/org/gnome/terminal/legacy/profiles:/:$uuid/" < "$f"
+    # wallpaper re-render (the watcher picks the crystal change up too) and live backdrop
+    "$HOME/.local/bin/kyberos-wallpaper" >/dev/null 2>&1 || true
+    if pgrep -f "kyberos/backdrop/live.qml" >/dev/null; then
+        "$HOME/.local/bin/kyberos-live" off >/dev/null; "$HOME/.local/bin/kyberos-live" on >/dev/null
+    fi
+    [ $quiet = 1 ] || echo "kyber crystal: $Cap ($hex)"
+    exit 0
+fi
+
+# ---- Plasma ----
 w() { kwriteconfig6 "$@"; }
 # plasma-apply-* push cursor/colours to XWayland apps via xrdb, which needs X auth
 if [ -z "${DISPLAY:-}" ] || [ -z "${XAUTHORITY:-}" ]; then
@@ -55,8 +93,5 @@ gdbus call --session --dest org.kde.KWin --object-path /KWin --method org.kde.KW
 for e in kyberos_open kyberos_wipe; do
     gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.reconfigureEffect "$e" >/dev/null 2>&1 || true
 done
-
-mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos"
-echo "$crystal" > "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal"
 
 [ $quiet = 1 ] || echo "kyber crystal: $Cap ($hex)"

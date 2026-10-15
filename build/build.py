@@ -29,6 +29,8 @@ GENERATORS = [
     "gen_lnf",
     "gen_kvantum",
     "gen_sddm",
+    "gen_gtk",
+    "gen_cinnamon",
 ]
 
 # src/ subtrees copied verbatim into dist/ (plymouth is handled by its generator)

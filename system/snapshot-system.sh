@@ -23,7 +23,7 @@ theme=$(plymouth-set-default-theme 2>/dev/null || true)
 [ -n "$theme" ] && [ -d "/usr/share/plymouth/themes/$theme" ] && paths+=("/usr/share/plymouth/themes/$theme")
 for p in /etc/plymouth /etc/plasmalogin.conf /etc/plasmalogin.conf.d /var/lib/plasmalogin \
          /etc/default/grub /usr/local/share /etc/sddm.conf /etc/sddm.conf.d /var/lib/sddm/.config \
-         /usr/share/plymouth/themes/default.plymouth /etc/mkinitcpio.conf /etc/initramfs-tools/conf.d; do
+         /usr/share/plymouth/themes/default.plymouth /etc/mkinitcpio.conf /etc/initramfs-tools/conf.d /etc/lightdm; do
     [ -e "$p" ] && paths+=("$p")
 done
 TAROPTS=(--xattrs --acls); command -v restorecon >/dev/null && TAROPTS+=(--selinux)   # SELinux distros

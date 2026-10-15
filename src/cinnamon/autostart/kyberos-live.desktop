@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=KyberOS live backdrop
+Comment=Animated KyberOS scenes behind the desktop (experimental)
+Exec=sh -c '"$HOME"/.local/bin/kyberos-live run'
+OnlyShowIn=X-Cinnamon;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

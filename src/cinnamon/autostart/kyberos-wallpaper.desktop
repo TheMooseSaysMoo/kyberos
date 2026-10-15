@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=KyberOS wallpaper
+Comment=Per-monitor KyberOS scenes; re-renders when monitors change
+Exec=sh -c '"$HOME"/.local/bin/kyberos-wallpaper --watch'
+OnlyShowIn=X-Cinnamon;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

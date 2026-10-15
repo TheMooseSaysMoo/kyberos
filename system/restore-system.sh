@@ -23,14 +23,14 @@ rm -f /var/lib/kyberos/plymouth-previous
 
 ASIDE=$SNAP/replaced-$(date +%Y%m%d-%H%M%S)
 say "restoring greeter config (current copies -> $ASIDE)"
-for p in /etc/plasmalogin.conf.d /var/lib/plasmalogin/.config /etc/plymouth /etc/sddm.conf.d; do
+for p in /etc/plasmalogin.conf.d /var/lib/plasmalogin/.config /etc/plymouth /etc/sddm.conf.d /etc/lightdm; do
     [ -e "$p" ] || continue
     mkdir -p "$ASIDE$(dirname "$p")"
     mv "$p" "$ASIDE$p"
 done
 want=()
 in_tar=$(tar --zstd -tf "$SNAP/system.tar.zst" | sed 's#/$##')
-for p in etc/plasmalogin.conf.d var/lib/plasmalogin/.config etc/plymouth etc/sddm.conf.d; do
+for p in etc/plasmalogin.conf.d var/lib/plasmalogin/.config etc/plymouth etc/sddm.conf.d etc/lightdm; do
     grep -qxF "$p" <<<"$in_tar" && want+=("$p")
 done
 [ ${#want[@]} -gt 0 ] && tar --zstd -xpf "$SNAP/system.tar.zst" "${TAROPTS[@]}" -C / "${want[@]}"

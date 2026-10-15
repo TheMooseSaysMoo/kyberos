@@ -18,7 +18,11 @@ U=${SUDO_USER:?run with sudo from the desktop user}
 
 "$HERE/system/snapshot-system.sh"
 echo "[kyberos] installing packages ($KYB_FAMILY)"
-pk=$(kyb_pkg rsvg xcursorgen kconfig kvantum shapes gdbus python curl fontconfig zstd)
+if [ "$(sudo -u "$U" bash -c ". '$HERE/lib/distro.sh'; kyb_desktop")" = cinnamon ]; then
+    pk=$(kyb_pkg rsvg xcursorgen qml xrandr dconf gdbus python curl fontconfig zstd)
+else
+    pk=$(kyb_pkg rsvg xcursorgen kconfig kvantum shapes gdbus python curl fontconfig zstd)
+fi
 command -v plymouth-set-default-theme >/dev/null && pk="$pk $(kyb_pkg plymouth-script)"
 kyb_install $pk
 echo "[kyberos] building as $U"

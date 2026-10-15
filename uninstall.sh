@@ -17,6 +17,44 @@ stock() {
     echo org.kde.breeze.desktop
 }
 say() { printf '\033[1;36m[kyberos]\033[0m %s\n' "$*"; }
+. "$HERE/lib/distro.sh"
+
+# ---- Cinnamon ----
+if [ "$(kyb_desktop)" = cinnamon ]; then
+    . "$HERE/lib/install-cinnamon.sh"
+    cin_session_env
+    CB=$STATE/backup-original-cinnamon
+    pkill -f "kyberos-wallpaper --watch" 2>/dev/null || true
+    pkill -f "kyberos/backdrop/live.qml" 2>/dev/null || true
+    rm -f "$CONF/autostart/kyberos-wallpaper.desktop" "$CONF/autostart/kyberos-live.desktop"
+    if [ -d "$CB" ]; then
+        dconf reset -f /org/cinnamon/ && dconf load /org/cinnamon/ < "$CB/cinnamon.dconf"
+        [ -s "$CB/terminal.dconf" ] && dconf reset -f /org/gnome/terminal/ && dconf load /org/gnome/terminal/ < "$CB/terminal.dconf"
+        [ -s "$CB/gnome-interface.dconf" ] && dconf load /org/gnome/desktop/interface/ < "$CB/gnome-interface.dconf"
+        if [ -d "$CB/spices" ]; then rm -rf "$CONF/cinnamon/spices"; cp -a "$CB/spices" "$CONF/cinnamon/spices"; fi
+        say "restored Cinnamon settings from $CB"
+    else
+        say "no backup found; switching to the Mint-Y look"
+        gsettings set org.cinnamon.desktop.interface gtk-theme Mint-Y-Dark-Aqua 2>/dev/null || true
+        gsettings set org.cinnamon.theme name Mint-Y-Dark-Aqua 2>/dev/null || true
+        gsettings set org.cinnamon.desktop.wm.preferences theme Mint-Y 2>/dev/null || true
+    fi
+    # GTK 4: drop our links, put back what was there
+    for f in gtk.css gtk-dark.css assets; do
+        [ -L "$CONF/gtk-4.0/$f" ] && rm -f "$CONF/gtk-4.0/$f"
+        [ -e "$CONF/gtk-4.0/$f.pre-kyberos" ] && mv "$CONF/gtk-4.0/$f.pre-kyberos" "$CONF/gtk-4.0/$f"
+    done
+    rm -rf "$DATA"/themes/KyberOS-* "$DATA"/icons/KyberOS* "$DATA/sounds/KyberOS" "$DATA"/wallpapers/KyberOS-* \
+           "$DATA/cinnamon/applets/kyberos-diagnostics@kyberos" "$DATA/cinnamon/extensions/kyberos-effects@kyberos" "$DATA/fonts/kyberos"
+    rm -f "$HOME"/.local/bin/kyberos-{crystal,greeting,wallpaper,live}
+    fc-cache -f >/dev/null 2>&1 || true
+    [ "${1:-}" = --system ] && sudo "$HERE/system/uninstall-system.sh"
+    rm -rf "$STATE"
+    say "KyberOS removed"
+    exit 0
+fi
+
+# ---- Plasma ----
 
 if [ -d "$BACKUP" ]; then
     prev=$(cat "$BACKUP/lookandfeel" 2>/dev/null || true)
