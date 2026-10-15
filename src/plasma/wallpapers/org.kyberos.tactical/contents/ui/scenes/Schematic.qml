@@ -111,7 +111,7 @@ Item {
     }
     Repeater {
         model: [
-            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, dx: -0.1, dy: -0.26 },
+            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, dx: 0.03, dy: -0.22 },
             { label: "MAIN REACTOR", nx: 0.3, ny: 0.5, dx: 0.02, dy: 0.3 },
             { label: "HANGAR 02", nx: 0.5, ny: 0.56, dx: 0.12, dy: 0.24 },
             { label: "SHIELD GENERATOR", nx: 0.62, ny: 0.32, dx: 0.12, dy: -0.2 },
