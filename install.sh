@@ -2,7 +2,7 @@
 # KyberOS installer (Plasma 6 / Fedora).
 #
 #   ./install.sh                  build + install for this user, apply theme, keep panels
-#   ./install.sh --layout         ...and replace the panel layout with the KyberOS one
+#   ./install.sh --layout         ...and replace the panel layout with the KyberOS one (pinned apps kept)
 #   ./install.sh --crystal red    pick the kyber crystal (blue green red purple yellow white)
 #   ./install.sh --system         also install the boot splash + login greeter theme (sudo)
 #   ./install.sh --no-apply       install files only
@@ -113,8 +113,28 @@ if [ $APPLY = 1 ]; then
         xa=$(ls /run/user/$(id -u)/xauth_* 2>/dev/null | head -1)
         [ -n "$xa" ] && export XAUTHORITY=$xa
     fi
+    pshell() { gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
+               --method org.kde.PlasmaShell.evaluateScript "$1" 2>/dev/null |
+           python3 -c 'import ast, sys; print(ast.literal_eval(sys.stdin.read())[0])' 2>/dev/null; }
     if [ $LAYOUT = 1 ]; then
+        # carry the pinned apps from the current task manager over to the KyberOS dock
+        pinned=$(pshell '
+            var l = "";
+            panels().forEach(function (p) { p.widgets().forEach(function (w) {
+                if (l || !/^org\.kde\.plasma\.(icon)?tasks$/.test(w.type)) return;
+                w.currentConfigGroup = ["General"];
+                var v = w.readConfig("launchers", "");
+                l = (typeof v === "string") ? v : v.join(",");
+            }) });
+            print(l);')
         plasma-apply-lookandfeel -a org.kyberos.desktop --resetLayout
+        if [ -n "$pinned" ]; then
+            say "keeping your pinned apps in the dock"
+            pshell "panels().forEach(function (p) { p.widgets('org.kde.plasma.icontasks').forEach(function (w) {
+                    w.currentConfigGroup = ['General'];
+                    w.writeConfig('launchers', '$pinned'.split(','));
+                }) });" >/dev/null
+        fi
     else
         plasma-apply-lookandfeel -a org.kyberos.desktop
     fi
