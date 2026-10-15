@@ -4,7 +4,7 @@ import json
 import math
 import random
 from palette import *
-from glyphs import wordmark, crystal as crystal_svg
+from glyphs import wordmark, text_width, crystal as crystal_svg
 import raster
 
 W, H = 3840, 2160
@@ -151,7 +151,7 @@ def svg(crystal, sweep=True):
 {readout(200, 260, 420, 5, DATA, seed=2)}
 {''.join(leds)}
 {readout(W - 760, H - 470, 520, 3, a, seed=5)}
-<g opacity="0.75">{crystal_svg(W - 920, H - 260, 74, a)}{wordmark(W - 560, H - 260, 7.5, TEXT, a)}</g>
+<g opacity="0.75">{crystal_svg(W - 560 - text_width('KYBER OS', 7.5) / 2 - 48, H - 260, 74, a)}{wordmark(W - 560, H - 260, 7.5, TEXT, a)}</g>
 <rect width="{W}" height="{H}" fill="url(#scan)"/>
 <rect width="{W}" height="{H}" fill="url(#vignette)"/>
 </svg>
