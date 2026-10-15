@@ -111,11 +111,11 @@ Item {
     }
     Repeater {
         model: [
-            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, dx: -0.12, dy: -0.16 },
-            { label: "MAIN REACTOR", nx: 0.3, ny: 0.5, dx: -0.06, dy: 0.2 },
-            { label: "HANGAR 02", nx: 0.5, ny: 0.56, dx: 0.06, dy: 0.18 },
-            { label: "SHIELD GENERATOR", nx: 0.62, ny: 0.32, dx: 0.1, dy: -0.15 },
-            { label: "ION DRIVE ARRAY", nx: 0.035, ny: 0.64, dx: -0.14, dy: 0.12 },
+            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, dx: -0.1, dy: -0.26 },
+            { label: "MAIN REACTOR", nx: 0.3, ny: 0.5, dx: 0.02, dy: 0.3 },
+            { label: "HANGAR 02", nx: 0.5, ny: 0.56, dx: 0.12, dy: 0.24 },
+            { label: "SHIELD GENERATOR", nx: 0.62, ny: 0.32, dx: 0.12, dy: -0.2 },
+            { label: "ION DRIVE ARRAY", nx: 0.035, ny: 0.64, dx: -0.1, dy: 0.22 },
         ]
         Item {
             id: callout
@@ -184,10 +184,5 @@ Item {
         Text { text: "SCHEMATIC  //  CLASS II CRUISER"; color: s.accent; font.family: s.mono; font.pixelSize: Math.max(13, s.u * 0.02); font.letterSpacing: 4 }
         Text { text: "DECK PLAN 07-G   REV 4"; color: s.phosphor; opacity: 0.7; font.family: s.mono; font.pixelSize: Math.max(10, s.u * 0.013); font.letterSpacing: 3 }
         Readout { colour: s.phosphor; rows: 4; rowHeight: s.u * 0.008; barWidth: s.u * 0.2; seed: 11; animate: s.animate }
-    }
-    Readout {
-        anchors.right: parent.right; anchors.rightMargin: s.width * 0.05
-        anchors.bottom: parent.bottom; anchors.bottomMargin: s.height * 0.12
-        colour: s.accent; rows: 4; rowHeight: s.u * 0.008; barWidth: s.u * 0.22; seed: 13; animate: s.animate
     }
 }
