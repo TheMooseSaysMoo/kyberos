@@ -11,6 +11,7 @@
 #                  installed Plasma packages, so you can see what was there at a glance
 #   SHA256SUMS
 # Lives outside ~/.local/share/kyberos on purpose: uninstall.sh deletes that directory.
+# KyberOS's own state (crystal, install.sh's partial backup) is included when present.
 set -uo pipefail
 
 STAMP=${1:-$(date +%Y%m%d-%H%M%S)}
@@ -33,7 +34,7 @@ done
 excludes=(
     --exclude=.local/share/Steam --exclude=.local/share/wineprefixes --exclude=.local/share/flatpak
     --exclude=.local/share/firefoxpwa --exclude=.local/share/streamdock-linux --exclude=.local/share/Trash
-    --exclude=.local/share/baloo --exclude=.local/share/containers --exclude=.local/share/kyberos
+    --exclude=.local/share/baloo --exclude=.local/share/containers
     --exclude='.config/*/Cache' --exclude='.config/*/CachedData' --exclude='.config/*/GPUCache'
     --exclude='.config/*/Code Cache' --exclude='.config/*/Service Worker/CacheStorage'
 )

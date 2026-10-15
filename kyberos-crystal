@@ -53,6 +53,7 @@ for e in kyberos_open kyberos_wipe; do
     gdbus call --session --dest org.kde.KWin --object-path /Effects --method org.kde.kwin.Effects.reconfigureEffect "$e" >/dev/null 2>&1 || true
 done
 
-echo "$crystal" > "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal" 2>/dev/null || true
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos"
+echo "$crystal" > "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal"
 
 [ $quiet = 1 ] || echo "kyber crystal: $Cap ($hex)"
