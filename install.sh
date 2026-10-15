@@ -68,7 +68,7 @@ if [ "$DESKTOP" = plasma ]; then
 else
     command -v xrandr >/dev/null || need+=($(kyb_pkg xrandr))
     command -v dconf >/dev/null || need+=($(kyb_pkg dconf))
-    for p in $(kyb_pkg qml); do kyb_installed "$p" || need+=("$p"); done
+    for p in $(kyb_pkg qml); do kyb_installed "$p" || ! kyb_available "$p" || need+=("$p"); done
 fi
 if [ ${#need[@]} -gt 0 ] && [ "$KYB_FAMILY" != unknown ]; then
     say "installing: ${need[*]} ($KYB_FAMILY, sudo)"

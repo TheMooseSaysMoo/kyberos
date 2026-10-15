@@ -62,6 +62,15 @@ kyb_installed() {
     esac
 }
 
+kyb_available() {
+    case $KYB_FAMILY in
+        fedora) dnf -q info "$1" >/dev/null 2>&1 ;;
+        debian) apt-cache show "$1" >/dev/null 2>&1 ;;
+        arch)   pacman -Si "$1" >/dev/null 2>&1 ;;
+        *)      return 1 ;;
+    esac
+}
+
 kyb_install() {
     [ $# -gt 0 ] || return 0
     case $KYB_FAMILY in
