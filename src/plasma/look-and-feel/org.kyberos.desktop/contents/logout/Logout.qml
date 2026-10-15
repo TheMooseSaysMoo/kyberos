@@ -144,7 +144,7 @@ Item {
         id: ring
         width: Kirigami.Units.gridUnit * 9
         height: width
-        anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.verticalCenter; bottomMargin: Kirigami.Units.gridUnit * 2.2 }
+        anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.verticalCenter; bottomMargin: Kirigami.Units.gridUnit * 1.1 }
         Shape {
             anchors.fill: parent
             preferredRendererType: Shape.CurveRenderer
@@ -275,7 +275,7 @@ Item {
         GridLayout {
             id: logoutButtonsRow
 
-            readonly property int spacing: Kirigami.Units.largeSpacing
+            readonly property int spacing: Kirigami.Units.gridUnit
             rowSpacing: spacing
             columnSpacing: spacing
 
