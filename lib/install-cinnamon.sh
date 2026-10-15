@@ -153,6 +153,7 @@ cin_apply() {
     mkdir -p "$CONF/autostart"
     cp "$STATE/autostart/kyberos-wallpaper.desktop" "$CONF/autostart/"
     pkill -f "kyberos-wallpaper --watch" 2>/dev/null || true
+    rm -f "$STATE"/wallpaper/kyberos-*.png          # the renderer may have changed: no stale cache
     "$HOME/.local/bin/kyberos-wallpaper" >/dev/null || say "  ! could not render the wallpaper (qml runtime missing?)"
     setsid "$HOME/.local/bin/kyberos-wallpaper" --watch >/dev/null 2>&1 < /dev/null &
     [ "${LIVE:-0}" = 1 ] && "$HOME/.local/bin/kyberos-live" on

@@ -43,7 +43,7 @@ kyb_pkg() {
             fedora:python) echo python3 ;;          debian:python) echo python3 ;;         arch:python) echo python ;;
             # Cinnamon side: the qml runtime + modules (scene renders), xrandr, dconf
             fedora:qml) echo qt6-qtdeclarative-devel qt6-qtsvg ;;
-            debian:qml) echo qml-qt6 qt6-svg-plugins qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
+            debian:qml) echo qml-qt6 libqt6svg6 qt6-svg-plugins qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
             arch:qml) echo qt6-declarative qt6-svg ;;
             fedora:xrandr) echo xrandr ;;           debian:xrandr) echo x11-xserver-utils ;; arch:xrandr) echo xorg-xrandr ;;
             fedora:dconf) echo dconf ;;             debian:dconf) echo dconf-cli ;;         arch:dconf) echo dconf ;;
@@ -67,8 +67,14 @@ kyb_install() {
     case $KYB_FAMILY in
         fedora) dnf -y install "$@" ;;
         debian) export DEBIAN_FRONTEND=noninteractive
-                apt-get -y install --no-install-recommends "$@" 2>/dev/null ||
-                    { apt-get update && apt-get -y install --no-install-recommends "$@"; } ;;
+                # names differ between Debian and Ubuntu releases: skip the ones this one lacks
+                local p ok=()
+                for p in "$@"; do
+                    apt-cache show "$p" >/dev/null 2>&1 && ok+=("$p") || echo "  (no package '$p' here, skipping)" >&2
+                done
+                [ ${#ok[@]} -gt 0 ] || return 0
+                apt-get -y install --no-install-recommends "${ok[@]}" 2>/dev/null ||
+                    { apt-get update && apt-get -y install --no-install-recommends "${ok[@]}"; } ;;
         arch)   pacman -S --needed --noconfirm "$@" ;;
         *)      echo "don't know how to install packages on this distro: $*" >&2; return 1 ;;
     esac
