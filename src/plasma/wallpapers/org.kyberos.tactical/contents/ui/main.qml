@@ -136,11 +136,12 @@ WallpaperItem {
         id: scanBand
         width: parent.width
         height: parent.height * 0.12
-        opacity: 0.07
+        opacity: 0.06
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.85; color: root.accent }
-            GradientStop { position: 1.0; color: "#ffffff" }
+            GradientStop { position: 0.0; color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0) }
+            GradientStop { position: 0.9; color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.6) }
+            GradientStop { position: 0.97; color: root.accent }
+            GradientStop { position: 1.0; color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0) }
         }
         NumberAnimation on y {
             from: -scanBand.height; to: root.height
@@ -180,8 +181,9 @@ WallpaperItem {
             text: root.banner
             color: "#ffb02e"
             font.family: "Orbitron"
-            font.pixelSize: Math.max(16, root.height * 0.022)
-            font.letterSpacing: font.pixelSize * 0.35
+            readonly property real size: Math.max(16, root.height * 0.022)
+            font.pixelSize: size
+            font.letterSpacing: size * 0.35
             font.weight: Font.DemiBold
         }
         SequentialAnimation on opacity {

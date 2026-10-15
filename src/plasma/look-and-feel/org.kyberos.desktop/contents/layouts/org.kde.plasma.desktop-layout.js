@@ -42,13 +42,13 @@ dock.hiding = "dodgewindows";
 
 var tasks = dock.addWidget("org.kde.plasma.icontasks");
 tasks.currentConfigGroup = ["General"];
-tasks.writeConfig("launchers", [
-    "applications:org.kde.dolphin.desktop",
-    "applications:org.kde.konsole.desktop",
-    "applications:firefox.desktop",
-    "applications:systemsettings.desktop",
-    "applications:org.kde.discover.desktop"
-].join(","));
+// first installed browser wins; skip launchers whose app is missing
+var browsers = ["org.mozilla.firefox.desktop", "firefox.desktop", "app.zen_browser.zen.desktop", "zen.desktop", "chromium-browser.desktop"];
+var browser = browsers.filter(function (b) { return applicationExists(b); })[0];
+var launchers = ["org.kde.dolphin.desktop", "org.kde.konsole.desktop", browser,
+                 "systemsettings.desktop", "org.kde.discover.desktop"];
+tasks.writeConfig("launchers", launchers.filter(function (l) { return l && applicationExists(l); })
+    .map(function (l) { return "applications:" + l; }).join(","));
 tasks.writeConfig("indicateAudioStreams", "true");
 
 dock.addWidget("org.kde.plasma.marginsseparator");

@@ -99,6 +99,12 @@ install -m 755 "$HERE/kyberos-crystal" "$HOME/.local/bin/kyberos-crystal"
 
 if [ $APPLY = 1 ]; then
     say "applying KyberOS"
+    # XWayland apps get the cursor/fonts via xrdb, which needs the X display
+    if [ -z "${DISPLAY:-}" ]; then
+        export DISPLAY=:0
+        xa=$(ls /run/user/$(id -u)/xauth_* 2>/dev/null | head -1)
+        [ -n "$xa" ] && export XAUTHORITY=$xa
+    fi
     if [ $LAYOUT = 1 ]; then
         plasma-apply-lookandfeel -a org.kyberos.desktop --resetLayout
     else
