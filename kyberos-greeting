@@ -18,4 +18,4 @@ pad=$(( cols - ${#title} - ${#stamp} - 2 ))
 
 printf " ${A}%s${R}%*s${D}%s${R}\n" "$title" "$pad" "" "$stamp"
 printf " ${D}NODE${R} ${W}%s${R}   ${D}UPTIME${R} ${P}%s${R}   ${D}LOAD${R} ${P}%s${R}   ${D}MEM${R} ${P}%s${R}\n\n" \
-    "$(hostname -s)" "$up" "$load" "$mem"
+    "$(uname -n | cut -d. -f1)" "$up" "$load" "$mem"
