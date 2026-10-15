@@ -88,7 +88,8 @@ EOF
     say "Plasma Login Manager themed (applies at next logout/boot)"
     ;;
 sddm)
-    if ! ls /usr/bin/sddm-greeter-qt6 /usr/lib*/sddm/sddm-greeter-qt6 /usr/libexec/sddm-greeter-qt6 >/dev/null 2>&1; then
+    greeter6=$(command -v sddm-greeter-qt6 || ls /usr/lib*/sddm/sddm-greeter-qt6 /usr/libexec/sddm-greeter-qt6 2>/dev/null | head -1 || true)
+    if [ -z "$greeter6" ]; then
         say "SDDM has no Qt 6 greeter (sddm-greeter-qt6) here: skipping the login theme"
     else
         kyb_installed "$(kyb_pkg shapes)" || kyb_install $(kyb_pkg shapes)

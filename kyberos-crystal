@@ -16,9 +16,12 @@ Cap=${crystal^}
 hex=${HEX[$crystal]}
 w() { kwriteconfig6 "$@"; }
 # plasma-apply-* push cursor/colours to XWayland apps via xrdb, which needs X auth
-if [ -z "${XAUTHORITY:-}" ]; then
-    xa=$(ls /run/user/$(id -u)/xauth_* 2>/dev/null | head -1)
-    [ -n "$xa" ] && export XAUTHORITY=$xa DISPLAY=${DISPLAY:-:0}
+if [ -z "${DISPLAY:-}" ] || [ -z "${XAUTHORITY:-}" ]; then
+    # take the session's own values (Xwayland is :0 on some distros, :1 on others)
+    sp=$(pgrep -u "$(id -u)" -x plasmashell | head -1 || true)
+    [ -n "$sp" ] && while IFS= read -r -d '' kv; do
+        case $kv in DISPLAY=*|XAUTHORITY=*) export "$kv" ;; esac
+    done < "/proc/$sp/environ"
 fi
 
 plasma-apply-colorscheme "KyberOS$Cap" >/dev/null

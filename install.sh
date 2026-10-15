@@ -119,9 +119,11 @@ if [ $APPLY = 1 ]; then
     say "applying KyberOS"
     # XWayland apps get the cursor/fonts via xrdb, which needs the X display
     if [ -z "${DISPLAY:-}" ]; then
-        export DISPLAY=:0
-        xa=$(ls /run/user/$(id -u)/xauth_* 2>/dev/null | head -1)
-        [ -n "$xa" ] && export XAUTHORITY=$xa
+        # take the session's own values (Xwayland is :0 on some distros, :1 on others)
+        sp=$(pgrep -u "$(id -u)" -x plasmashell | head -1 || true)
+        [ -n "$sp" ] && while IFS= read -r -d '' kv; do
+            case $kv in DISPLAY=*|XAUTHORITY=*) export "$kv" ;; esac
+        done < "/proc/$sp/environ"
     fi
     pshell() { gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
                --method org.kde.PlasmaShell.evaluateScript "$1" 2>/dev/null |
