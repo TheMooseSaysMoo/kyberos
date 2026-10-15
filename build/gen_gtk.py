@@ -162,6 +162,16 @@ tooltip label {{ font-family: "{FONTS['mono']}"; }}
 row:selected, treeview.view:selected, iconview:selected, flowboxchild:selected {{
   background-color: alpha({a}, 0.32); color: {TEXT}; box-shadow: inset 2px 0 {a}; }}
 scrollbar slider {{ border-radius: 0; }}
+
+/* window buttons (client-side title bars): square, lit on hover, close goes red */
+headerbar button.titlebutton, .titlebar button.titlebutton, windowcontrols button {{
+  border-radius: 0; border: none; box-shadow: none; background: none; background-image: none;
+  color: {TEXT}; min-width: 26px; min-height: 22px; padding: 0 3px; margin: 0 1px; }}
+headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover, windowcontrols button:hover {{
+  background-color: alpha({a}, 0.22); box-shadow: inset 0 0 0 1px {a}; color: {a}; }}
+headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover, windowcontrols button.close:hover {{
+  background-color: {ALERT}; box-shadow: none; color: #ffffff; }}
+headerbar button.titlebutton:backdrop, windowcontrols button:backdrop {{ color: {FAINT}; }}
 scrollbar slider:hover {{ background: {a}; }}
 """
 

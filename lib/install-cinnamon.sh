@@ -94,6 +94,9 @@ for pair in pairs:
     cfg.setdefault(k, {"type": "generic"})["value"] = json.loads(v)
 json.dump(cfg, open(path, "w"), indent=4)
 PY
+    # Cinnamon reads applet settings at load time: reload the applet so they show now
+    gdbus call --session --dest org.Cinnamon --object-path /org/Cinnamon \
+        --method org.Cinnamon.ReloadXlet "$uuid" APPLET >/dev/null 2>&1 || true
 }
 
 cin_layout() {
