@@ -136,6 +136,7 @@ def kyber_layer(a, gtk4):
     return f"""
 /* ==== KyberOS layer ================================================= */
 * {{ outline-color: alpha({a}, 0.6); }}
+decoration, .titlebar, headerbar.titlebar {{ border-radius: 0; }}
 headerbar, .titlebar {{ background: {STEEL}; border-bottom: 1px solid alpha({a}, 0.45); box-shadow: none; }}
 headerbar .title, .titlebar .title {{ font-family: "{FONTS['title']}"; font-weight: 600; letter-spacing: 2px; }}
 headerbar .subtitle {{ font-family: "{FONTS['mono']}"; color: {DIM}; }}

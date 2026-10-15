@@ -127,6 +127,11 @@ cin_layout() {
 cin_apply() {
     say "applying KyberOS (Cinnamon)"
     local gs="gsettings set"
+    # Muffin caches window-border CSS per theme name for the whole session: an update or a
+    # reinstall over the same theme only shows new borders after a Cinnamon restart
+    case $(gsettings get org.cinnamon.desktop.wm.preferences theme 2>/dev/null) in
+        *KyberOS-*) CIN_RESTART_HINT=1 ;;
+    esac
     $gs org.cinnamon.desktop.interface gtk-theme "KyberOS-$Cap"
     $gs org.cinnamon.desktop.wm.preferences theme "KyberOS-$Cap"
     $gs org.cinnamon.theme name "KyberOS-$Cap"
@@ -172,6 +177,7 @@ cin_apply() {
     "$HOME/.local/bin/kyberos-wallpaper" >/dev/null || say "  ! could not render the wallpaper (qml runtime missing?)"
     setsid "$HOME/.local/bin/kyberos-wallpaper" --watch >/dev/null 2>&1 < /dev/null &
     [ "${LIVE:-0}" = 1 ] && "$HOME/.local/bin/kyberos-live" on
+    [ "${CIN_RESTART_HINT:-0}" = 1 ] && say "window borders refresh after a Cinnamon restart: press Ctrl+Alt+Esc"
     return 0
 }
 
