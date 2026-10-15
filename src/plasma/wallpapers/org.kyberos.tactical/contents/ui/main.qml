@@ -154,11 +154,13 @@ WallpaperItem {
 
     // ---- banner (lock screen / login greeter) ---------------------------
     Item {
+        id: bannerBox
         visible: root.banner.length > 0
         anchors.horizontalCenter: parent.horizontalCenter
-        y: parent.height * 0.12
+        y: parent.height * 0.8
         width: bannerText.implicitWidth + 80
         height: bannerText.implicitHeight + 28
+        readonly property real cut: 14
 
         Shape {
             anchors.fill: parent
@@ -166,13 +168,13 @@ WallpaperItem {
                 strokeColor: "#ffb02e"
                 strokeWidth: 2
                 fillColor: Qt.rgba(0.024, 0.031, 0.043, 0.82)
-                startX: 14; startY: 0
-                PathLine { x: parent.width; y: 0 }
-                PathLine { x: parent.width; y: parent.height - 14 }
-                PathLine { x: parent.width - 14; y: parent.height }
-                PathLine { x: 0; y: parent.height }
-                PathLine { x: 0; y: 14 }
-                PathLine { x: 14; y: 0 }
+                startX: bannerBox.cut; startY: 0
+                PathLine { x: bannerBox.width; y: 0 }
+                PathLine { x: bannerBox.width; y: bannerBox.height - bannerBox.cut }
+                PathLine { x: bannerBox.width - bannerBox.cut; y: bannerBox.height }
+                PathLine { x: 0; y: bannerBox.height }
+                PathLine { x: 0; y: bannerBox.cut }
+                PathLine { x: bannerBox.cut; y: 0 }
             }
         }
         Text {
@@ -181,7 +183,7 @@ WallpaperItem {
             text: root.banner
             color: "#ffb02e"
             font.family: "Orbitron"
-            readonly property real size: Math.max(16, root.height * 0.022)
+            readonly property real size: Math.max(14, root.height * 0.018)
             font.pixelSize: size
             font.letterSpacing: size * 0.35
             font.weight: Font.DemiBold
