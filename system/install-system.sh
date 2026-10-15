@@ -43,7 +43,7 @@ chmod -R a+rX "$LOCAL/plasma" "$LOCAL/color-schemes" "$LOCAL/icons" "$LOCAL/font
 # ---- greeter configuration ----
 cat > /etc/plasmalogin.conf.d/50-kyberos.conf <<EOF
 [Greeter]
-WallpaperPlugin=org.kyberos.tactical
+WallpaperPluginId=org.kyberos.tactical
 
 [Greeter][Wallpaper][org.kyberos.tactical][General]
 Crystal=$CRYSTAL
