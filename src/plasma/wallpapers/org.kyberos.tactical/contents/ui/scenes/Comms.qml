@@ -126,7 +126,7 @@ Item {
         width: scope.width
         height: s.height * 0.94 - y
         clip: true
-        readonly property int count: Math.max(4, Math.floor(width / (s.u * 0.075)))
+        readonly property int count: s.u > 0 ? Math.min(60, Math.max(4, Math.floor(width / (s.u * 0.075)))) : 4
         Row {
             spacing: columns.width / columns.count * 0.25
             Repeater {

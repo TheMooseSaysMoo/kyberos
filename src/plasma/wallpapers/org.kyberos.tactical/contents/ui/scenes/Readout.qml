@@ -23,7 +23,10 @@ Column {
             readonly property var widths: {
                 var r = Geo.rng(readout.seed * 97 + index * 13)
                 var out = [], used = 0
-                while (true) {
+                // a scene can be built before it has a size; with zero-width bars the row would
+                // never fill (this ate 59 GB in the login greeter), so bail out and cap it anyway
+                if (!(readout.rowHeight > 0) || !(readout.barWidth > 0)) return out
+                while (out.length < 64) {
                     var w = readout.rowHeight * [1.2, 2, 3, 4.5, 6][Math.floor(r() * 5)]
                     if (used + w > readout.barWidth) break
                     out.push({ w: w, o: [0.25, 0.4, 0.65][Math.floor(r() * 3)] })

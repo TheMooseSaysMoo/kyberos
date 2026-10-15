@@ -69,6 +69,8 @@ WallpaperItem {
     Loader {
         id: sceneLoader
         anchors.fill: parent
+        // scenes lay themselves out from their size; don't build one until there is a size
+        active: width > 0 && height > 0
         sourceComponent: ({ tactical: tactical, schematic: schematic, targeting: targeting, comms: comms })[root.scene] || tactical
     }
     Component { id: tactical; Tactical { accent: root.accent; animate: root.animate; sweepSeconds: root.configuration.SweepSeconds } }
