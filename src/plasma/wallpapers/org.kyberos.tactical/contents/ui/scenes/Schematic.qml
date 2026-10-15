@@ -27,7 +27,7 @@ Item {
         anchors.verticalCenterOffset: s.portrait ? 0 : -s.height * 0.03
         rotation: s.portrait ? -90 : 0
 
-        function P(list) { return Geo.scale(list, ship.len, ship.wid, 0, 0) }
+        function pts(list) { return Geo.scale(list, ship.len, ship.wid, 0, 0) }
 
         // hull outline, normalised (x along length, y across width)
         readonly property var hull: [[1.0, 0.5], [0.24, 0.04], [0.16, 0.06], [0.16, 0.0], [0.08, 0.0], [0.08, 0.1], [0.03, 0.18],
@@ -41,17 +41,17 @@ Item {
             ShapePath {   // hull
                 strokeColor: s.accent; strokeWidth: Math.max(1.5, s.u * 0.002)
                 fillColor: Qt.rgba(s.accent.r, s.accent.g, s.accent.b, 0.06)
-                PathPolyline { path: ship.P(ship.hull) }
+                PathPolyline { path: ship.pts(ship.hull) }
             }
             ShapePath {   // inner deck + spine + frame ribs
                 strokeColor: Qt.rgba(s.accent.r, s.accent.g, s.accent.b, 0.4); strokeWidth: 1; fillColor: "transparent"
                 PathMultiline {
                     paths: {
-                        var out = [ship.P(ship.deck), ship.P([[0.0, 0.5], [0.96, 0.5]])]
+                        var out = [ship.pts(ship.deck), ship.pts([[0.0, 0.5], [0.96, 0.5]])]
                         for (var i = 1; i < 9; ++i) {
                             var x = 0.24 + i * 0.075
                             var half = 0.46 * (1 - (x - 0.24) / 0.76)
-                            out.push(ship.P([[x, 0.5 - half], [x, 0.5 + half]]))
+                            out.push(ship.pts([[x, 0.5 - half], [x, 0.5 + half]]))
                         }
                         return out
                     }
@@ -63,8 +63,8 @@ Item {
                     paths: [Geo.ellipse(ship.len * 0.035, ship.wid * 0.36, ship.wid * 0.06, ship.wid * 0.06, 0, 32),
                             Geo.ellipse(ship.len * 0.035, ship.wid * 0.5, ship.wid * 0.075, ship.wid * 0.075, 0, 32),
                             Geo.ellipse(ship.len * 0.035, ship.wid * 0.64, ship.wid * 0.06, ship.wid * 0.06, 0, 32),
-                            ship.P([[0.1, 0.4], [0.2, 0.4], [0.2, 0.6], [0.1, 0.6], [0.1, 0.4]]),
-                            ship.P([[0.42, 0.44], [0.58, 0.44], [0.58, 0.56], [0.42, 0.56], [0.42, 0.44]])]
+                            ship.pts([[0.1, 0.4], [0.2, 0.4], [0.2, 0.6], [0.1, 0.6], [0.1, 0.4]]),
+                            ship.pts([[0.42, 0.44], [0.58, 0.44], [0.58, 0.56], [0.42, 0.56], [0.42, 0.44]])]
                 }
             }
         }
