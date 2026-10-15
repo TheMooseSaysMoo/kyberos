@@ -94,13 +94,15 @@ StEntry:focus, #menu-search-entry:focus {{ border: 1px solid {a}; }}
 .dialog-header {{ font-family: "{FONTS['title']}"; font-weight: normal; letter-spacing: 3px; color: {a}; }}
 .dialog .dialog-button, .dialog .dialog-button:destructive-action, .dialog .dialog-button:default,
 .modal-dialog-button {{ border-radius: 0; background-color: {STEEL}; border: 1px solid {BEVEL};
-  font-family: "{FONTS['ui']}"; font-weight: normal; letter-spacing: 1px; color: {TEXT}; padding: 10px 22px; }}
+  font-family: "{FONTS['ui']}"; font-weight: normal; color: {TEXT}; padding: 10px 22px; }}
 .dialog .dialog-button:hover, .modal-dialog-button:hover {{ background-color: {RAISED}; border: 1px solid {a}; color: {TEXT}; }}
 .dialog .dialog-button:focus, .modal-dialog-button:focus {{ border: 1px solid {a}; }}
 .dialog .dialog-button:active, .dialog .dialog-button:checked {{ background-color: {rgba(a, 0.35)}; }}
 .dialog .dialog-button:default {{ border: 1px solid {AMBER}; color: {AMBER}; }}
-.dialog .dialog-button:destructive-action {{ border: 1px solid {ALERT}; color: {ALERT}; }}
-.dialog .dialog-button:destructive-action:hover {{ background-color: {ALERT}; color: #ffffff; }}
+/* (no letter-spacing on buttons: St measures labels without it, so spaced text gets ellipsized) */
+.dialog .dialog-button:destructive-action, .dialog .dialog-button:focus:destructive-action,
+.dialog .dialog-button:checked:destructive-action {{ background-color: {rgba(ALERT, 0.12)}; border: 1px solid {ALERT}; color: {ALERT}; }}
+.dialog .dialog-button:hover:destructive-action, .dialog .dialog-button:active:destructive-action {{ background-color: {ALERT}; border: 1px solid {ALERT}; color: #ffffff; }}
 
 /* notifications and OSD */
 .notification, #notification {{ border-radius: 0; background-color: {rgba(VOID, 0.96)}; border: 1px solid {BEVEL}; border-left: 3px solid {a}; }}
