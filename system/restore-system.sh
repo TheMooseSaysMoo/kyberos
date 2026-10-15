@@ -37,8 +37,12 @@ restorecon -R /etc/plasmalogin.conf.d /var/lib/plasmalogin /etc/plymouth 2>/dev/
 
 theme=$(cat "$SNAP/plymouth-theme" 2>/dev/null || true)
 if [ -n "$theme" ]; then
+    # a theme that isn't on disk any more (e.g. an older KyberOS) comes back from the archive
+    if [ ! -d "/usr/share/plymouth/themes/$theme" ] && grep -qxF "usr/share/plymouth/themes/$theme" <<<"$in_tar"; then
+        tar --zstd -xpf "$SNAP/system.tar.zst" --selinux -C / "usr/share/plymouth/themes/$theme"
+    fi
     say "boot splash -> '$theme' (rebuilding initramfs)"
-    plymouth-set-default-theme -R "$theme"
+    plymouth-set-default-theme -R "$theme" || { say "'$theme' failed, using bgrt"; plymouth-set-default-theme -R bgrt; }
 fi
 say "done. Packages KyberOS added (safe to keep; remove with dnf if wanted):"
 comm -13 "$SNAP/rpm-qa.txt" <(rpm -qa --qf '%{NAME}\n' | sort) | sed 's/^/  /'

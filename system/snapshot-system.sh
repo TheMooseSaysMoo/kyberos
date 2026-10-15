@@ -18,6 +18,8 @@ say() { printf '\033[1;35m[snapshot-system]\033[0m %s\n' "$*"; }
 
 say "archiving system config -> $OUT"
 paths=()
+theme=$(plymouth-set-default-theme 2>/dev/null || true)
+[ -n "$theme" ] && [ -d "/usr/share/plymouth/themes/$theme" ] && paths+=("/usr/share/plymouth/themes/$theme")
 for p in /etc/plymouth /etc/plasmalogin.conf /etc/plasmalogin.conf.d /var/lib/plasmalogin \
          /etc/default/grub /usr/local/share /etc/sddm.conf /etc/sddm.conf.d /var/lib/sddm/.config \
          /usr/share/plymouth/themes/default.plymouth; do
@@ -27,7 +29,7 @@ tar --zstd -cpf "$OUT/system.tar.zst" --xattrs --acls --selinux "${paths[@]}" 2>
     || { echo "tar failed, see $OUT/tar-warnings.txt" >&2; exit 1; }
 kver=$(uname -r)
 cp -a "/boot/initramfs-$kver.img" "$OUT/" 2>/dev/null && echo "$kver" > "$OUT/kernel"
-plymouth-set-default-theme > "$OUT/plymouth-theme" 2>/dev/null
+echo "$theme" > "$OUT/plymouth-theme"
 cat /proc/cmdline > "$OUT/cmdline"
 rpm -qa --qf '%{NAME}\n' | sort > "$OUT/rpm-qa.txt"
 

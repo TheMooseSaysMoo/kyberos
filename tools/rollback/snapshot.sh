@@ -75,8 +75,9 @@ gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
     desktops().forEach(function (d) {
         out.push({ desktop: d.id, screen: d.screen, wallpaper: d.wallpaperPlugin });
     });
-    print(JSON.stringify(out, null, 2));' > "$OUT/state/plasma-layout.txt" 2>&1 \
-    || echo "plasmashell not reachable" > "$OUT/state/plasma-layout.txt"
+    print(JSON.stringify(out, null, 2));' 2>/dev/null \
+    | python3 -c 'import ast, sys; print(ast.literal_eval(sys.stdin.read())[0])' > "$OUT/state/plasma-layout.json" 2>/dev/null \
+    || echo "plasmashell not reachable" > "$OUT/state/plasma-layout.json"
 
 kscreen-doctor -o 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' > "$OUT/state/screens.txt"
 systemctl --user list-unit-files --state=enabled --no-legend > "$OUT/state/user-units.txt" 2>/dev/null
