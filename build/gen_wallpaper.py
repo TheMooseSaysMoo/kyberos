@@ -172,11 +172,10 @@ def generate(out):
         (d / "metadata.json").write_text(json.dumps({"KPlugin": {
             "Id": name, "Name": f"KyberOS {crystal.capitalize()} Crystal",
             "Authors": [{"Name": "KyberOS"}], "License": "CC-BY-SA-4.0"}}, indent=2))
-        # base image for the animated wallpaper (the plugin draws the sweep)
-        base = out / "plasma" / "wallpapers" / "org.kyberos.tactical" / "contents" / "images"
-        base.mkdir(parents=True, exist_ok=True)
-        bsrc = base / f"{crystal}.svg"
-        bsrc.write_text(svg(crystal, sweep=False))
-        if raster.png(bsrc, base / f"{crystal}.png", 2560, 1440):
-            bsrc.unlink()
-    (out / "wallpapers" / "geometry.json").write_text(json.dumps({"size": [W, H], "radar": RADAR, "planet": PLANET}))
+        # wordmark for the animated plugin (scenes themselves are drawn in QML)
+        wm = out / "plasma" / "wallpapers" / "org.kyberos.tactical" / "contents" / "images"
+        wm.mkdir(parents=True, exist_ok=True)
+        tw = text_width("KYBER OS", 7.5)
+        (wm / f"wordmark-{crystal}.svg").write_text(
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{tw + 160:.0f}" height="160" viewBox="0 0 {tw + 160:.0f} 160">'
+            f'{crystal_svg(40, 80, 74, CRYSTALS[crystal])}{wordmark(120 + tw / 2, 80, 7.5, TEXT, CRYSTALS[crystal])}</svg>\n')

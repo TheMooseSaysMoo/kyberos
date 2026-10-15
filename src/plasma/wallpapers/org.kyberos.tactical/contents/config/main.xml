@@ -4,6 +4,10 @@
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
   <kcfgfile name=""/>
   <group name="General">
+    <entry name="Scene" type="String">
+      <label>Scene for this monitor: auto, tactical, schematic, targeting or comms</label>
+      <default>auto</default>
+    </entry>
     <entry name="Crystal" type="String">
       <label>Kyber crystal colour of the base image (blue, green, red, purple, yellow, white)</label>
       <default>blue</default>
