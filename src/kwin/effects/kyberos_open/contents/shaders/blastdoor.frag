@@ -25,26 +25,32 @@ void main()
 
     float open;     // 1 = doors fully retracted
     float alpha;
+    float doorAlpha;  // doors are solid almost at once; the window itself fades
     if (uClosing < 0.5) {
         alpha = smoothstep(0.0, 0.16, p);
+        doorAlpha = smoothstep(0.0, 0.05, p);
         float t = smoothstep(0.2, 1.0, p);
         open = 1.0 - pow(1.0 - t, 3.0);               // ease out
     } else {
         float t = smoothstep(0.0, 0.6, p);
         open = 1.0 - t * t;                           // ease in: doors slam
         alpha = 1.0 - smoothstep(0.7, 1.0, p);
+        doorAlpha = alpha;
     }
 
     float halfW = 0.5 * size.x;
     float leftEdge = halfW * (1.0 - open);            // left door covers [0, leftEdge]
     float rightEdge = halfW * (1.0 + open);           // right door covers [rightEdge, w]
     // window body only, not the drop shadow around it
-    float body = smoothstep(0.5, 0.85, tex.a);
+    float body = smoothstep(0.3, 0.6, tex.a);
 
     vec4 col = tex;
     if (px.x < leftEdge || px.x > rightEdge) {
         float inner = px.x < leftEdge ? leftEdge - px.x : px.x - rightEdge;  // px from the seam
-        vec3 steel = vec3(0.105, 0.125, 0.16) + (hash(floor(px.x * 0.5)) - 0.5) * 0.025;
+        float doorW = max(1.0, px.x < leftEdge ? leftEdge : size.x - rightEdge);
+        // brushed steel, lit toward the seam
+        vec3 steel = mix(vec3(0.13, 0.155, 0.19), vec3(0.22, 0.26, 0.31), 1.0 - clamp(inner / doorW, 0.0, 1.0));
+        steel += (hash(floor(px.x * 0.5)) - 0.5) * 0.03;
         // horizontal ribs
         float rib = step(fract(px.y / 48.0), 0.04);
         steel = mix(steel, vec3(0.06, 0.07, 0.09), rib * 0.9);
@@ -59,7 +65,11 @@ void main()
         // lit seam where the doors meet
         float glow = 1.0 - smoothstep(0.0, 5.0, inner);
         steel = mix(steel, uAccent.rgb, glow);
-        col = vec4(steel * body, body);
+        // bevel highlight along the outer frame of each door
+        float rim = 1.0 - smoothstep(0.0, 2.0, min(px.y, size.y - px.y));
+        steel += rim * 0.12;
+        fragColor = vec4(steel * body, body) * doorAlpha * modulation;
+        return;
     } else if (open < 1.0) {
         // doors cast shadow onto the revealed window near their edges
         float d = min(px.x - leftEdge, rightEdge - px.x);
