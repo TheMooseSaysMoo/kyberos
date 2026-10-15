@@ -1,0 +1,12 @@
+[Unit]
+Description=KyberOS: animated wallpaper on newly attached monitors
+PartOf=graphical-session.target
+After=plasma-plasmashell.service
+
+[Service]
+ExecStart=%h/.local/bin/kyberos-screens --watch
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=plasma-workspace.target

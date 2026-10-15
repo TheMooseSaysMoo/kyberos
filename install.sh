@@ -96,6 +96,9 @@ cp -r "$DIST/plasma/." "$DATA/plasma/"
 cp -r "$DIST/kwin/effects/." "$DATA/kwin/effects/"
 mkdir -p "$HOME/.local/bin"
 install -m 755 "$HERE/kyberos-crystal" "$HOME/.local/bin/kyberos-crystal"
+install -m 755 "$HERE/kyberos-screens" "$HOME/.local/bin/kyberos-screens"
+mkdir -p "$CONF/systemd/user"
+install -m 644 "$HERE/system/kyberos-screens.service" "$CONF/systemd/user/kyberos-screens.service"
 
 if [ $APPLY = 1 ]; then
     say "applying KyberOS"
@@ -141,6 +144,9 @@ if [ $APPLY = 1 ]; then
             d.writeConfig('Animate', 'true');
         });" >/dev/null 2>&1 || echo "  ! could not set the wallpaper (is plasmashell running?)"
     "$HOME/.local/bin/kyberos-crystal" "$CRYSTAL" --quiet
+    # new monitors get the animated wallpaper too
+    systemctl --user daemon-reload
+    systemctl --user enable --now kyberos-screens.service 2>/dev/null || true
     # make sure Plasma picks up the new wallpaper plugin, icons and panels
     systemctl --user restart plasma-plasmashell.service 2>/dev/null || true
 fi

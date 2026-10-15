@@ -30,7 +30,9 @@ rm -rf "$DATA"/aurorae/themes/KyberOS-* "$DATA"/wallpapers/KyberOS-* "$DATA"/ico
 rm -rf "$DATA/plasma/desktoptheme/KyberOS" "$DATA/plasma/look-and-feel/org.kyberos.desktop" \
        "$DATA/plasma/wallpapers/org.kyberos.tactical" "$DATA/plasma/plasmoids/org.kyberos.diagnostics"
 rm -rf "$DATA"/kwin/effects/kyberos_* "$DATA/fonts/kyberos"
-rm -f "$HOME/.local/bin/kyberos-crystal"
+systemctl --user disable --now kyberos-screens.service 2>/dev/null || true
+rm -f "$CONF/systemd/user/kyberos-screens.service"
+rm -f "$HOME/.local/bin/kyberos-crystal" "$HOME/.local/bin/kyberos-screens"
 fc-cache -f >/dev/null 2>&1 || true
 
 if [ "${1:-}" = --system ]; then

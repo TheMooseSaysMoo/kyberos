@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# kyberos-screens: give newly attached monitors the animated KyberOS wallpaper.
+# Plasma creates every new screen's desktop with the stock image plugin, so this
+# switches desktops still showing the default KyberOS static image (or Plasma's
+# own default) to org.kyberos.tactical. Desktops with any other wallpaper are left
+# alone. Scene "auto" then picks tactical/targeting/comms per monitor.
+#   kyberos-screens          check once
+#   kyberos-screens --watch  keep checking (run by kyberos-screens.service)
+set -u
+crystal=$(cat "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal" 2>/dev/null || echo blue)
+
+script="
+var changed = 0;
+desktops().forEach(function (d) {
+    if (d.wallpaperPlugin === 'org.kyberos.tactical') return;
+    if (d.wallpaperPlugin !== 'org.kde.image') return;
+    d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General'];
+    var img = String(d.readConfig('Image', ''));
+    if (img !== '' && img.indexOf('KyberOS') < 0 && img.indexOf('/usr/share/wallpapers/') < 0) return;
+    d.wallpaperPlugin = 'org.kyberos.tactical';
+    d.currentConfigGroup = ['Wallpaper', 'org.kyberos.tactical', 'General'];
+    d.writeConfig('Crystal', '$crystal');
+    d.writeConfig('Scene', 'auto');
+    changed++;
+});
+print(changed);
+"
+
+check() {
+    gdbus call --session --dest org.kde.plasmashell --object-path /PlasmaShell \
+        --method org.kde.PlasmaShell.evaluateScript "$script" >/dev/null 2>&1
+}
+
+if [ "${1:-}" = --watch ]; then
+    while true; do
+        check
+        sleep 5
+    done
+else
+    check
+fi
