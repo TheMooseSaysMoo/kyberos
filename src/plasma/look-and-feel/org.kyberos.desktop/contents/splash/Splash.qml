@@ -4,6 +4,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 import QtQuick
+import QtQuick.Window
 
 Rectangle {
     id: root
@@ -24,7 +25,8 @@ Rectangle {
     Item {
         id: field
         anchors.fill: parent
-        readonly property real maxD: Math.sqrt(width * width + height * height) / 2 + 60
+        // from the screen, not the window: the window may start small and grow
+        readonly property real maxD: Math.sqrt(Screen.width * Screen.width + Screen.height * Screen.height) / 2 + 60
 
         // Every star streaks outward on the render thread (Animators), so the
         // jump stays smooth while Plasma is busy starting up behind it.
@@ -52,9 +54,8 @@ Rectangle {
                         GradientStop { position: 0.7; color: "#9fd8ff" }
                         GradientStop { position: 1.0; color: "#ffffff" }
                     }
-                    // Animators fix their from/to when they start, so wait for the real size
                     ParallelAnimation {
-                        running: field.width > 0 && field.height > 0
+                        running: Screen.width > 0
                         loops: Animation.Infinite
                         XAnimator { target: streak; from: 6 - streak.width; to: field.maxD; duration: star.dur; easing.type: Easing.InQuad }
                         ScaleAnimator { target: streak; from: 0.05; to: 1.8; duration: star.dur; easing.type: Easing.InQuad }
