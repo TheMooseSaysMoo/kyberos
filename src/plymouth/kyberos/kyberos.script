@@ -24,15 +24,24 @@ for (k = 0; k < 4; k++)
     for (b = 0; b < NANGLES; b++)
         streaks[k][b] = Image("streak" + k + "_" + b + ".png");
 
+// rand() returns a constant in Fedora's Plymouth 24, so use a
+// Park-Miller generator (exact in doubles).
+seed = 20250527;
+fun rand() {
+    global.seed = global.seed * 16807;
+    global.seed = global.seed - Math.Int(global.seed / 2147483647) * 2147483647;
+    return global.seed / 2147483647;
+}
+
 // assignments inside a function are local unless written through global.
 fun spawn(i, near) {
-    global.star[i].bucket = Math.Min(NANGLES - 1, Math.Int(Math.Random() * NANGLES));
+    global.star[i].bucket = Math.Min(NANGLES - 1, Math.Int(rand() * NANGLES));
     global.star[i].angle = global.star[i].bucket * 2 * Math.Pi / NANGLES;
     if (near)
-        global.star[i].dist = 8 + Math.Random() * 40;
+        global.star[i].dist = 8 + rand() * 40;
     else
-        global.star[i].dist = 8 + Math.Random() * MAXD;
-    global.star[i].speed = 0.55 + Math.Random() * 0.9;
+        global.star[i].dist = 8 + rand() * MAXD;
+    global.star[i].speed = 0.55 + rand() * 0.9;
     global.star[i].level = -1;
 }
 
@@ -59,7 +68,7 @@ fun refresh() {
         star[i].dist += v;
         if (star[i].dist > MAXD) {
             // keep each star's rotated images: respawn on the same ray
-            star[i].dist = 8 + Math.Random() * 40;
+            star[i].dist = 8 + rand() * 40;
             star[i].level = -1;
         }
         if (v < 2.5) lvl = 0;
