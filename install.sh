@@ -101,6 +101,7 @@ cp -r "$DIST/kwin/tabbox/." "$DATA/kwin/tabbox/"
 mkdir -p "$HOME/.local/bin"
 install -m 755 "$HERE/kyberos-crystal" "$HOME/.local/bin/kyberos-crystal"
 install -m 755 "$HERE/kyberos-screens" "$HOME/.local/bin/kyberos-screens"
+install -m 755 "$HERE/kyberos-greeting" "$HOME/.local/bin/kyberos-greeting"
 mkdir -p "$CONF/systemd/user"
 install -m 644 "$HERE/system/kyberos-screens.service" "$CONF/systemd/user/kyberos-screens.service"
 

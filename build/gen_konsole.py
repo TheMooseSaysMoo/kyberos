@@ -43,7 +43,7 @@ CursorShape=0
 CursorShape=0
 
 [General]
-Command=/bin/bash
+Command=/bin/bash -c '"$HOME"/.local/bin/kyberos-greeting 2>/dev/null; exec /bin/bash'
 Name=KyberOS
 Parent=FALLBACK/
 TerminalMargin=8

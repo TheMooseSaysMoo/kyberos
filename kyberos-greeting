@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# KyberOS terminal greeting: two lines of ship status in the crystal colour.
+crystal=$(cat "${XDG_DATA_HOME:-$HOME/.local/share}/kyberos/crystal" 2>/dev/null || echo blue)
+case $crystal in
+    green) a="62;240;138" ;; red) a="255;45;63" ;; purple) a="178;100;255" ;;
+    yellow) a="255;210;60" ;; white) a="226;244;255" ;; *) a="51;181;255" ;;
+esac
+A="\e[38;2;${a}m"; D="\e[38;2;135;147;163m"; P="\e[38;2;166;242;196m"; W="\e[38;2;214;222;232m"; R="\e[0m"
+
+up=$(awk '{s=int($1); printf "%dh %02dm", s/3600, (s%3600)/60}' /proc/uptime)
+load=$(cut -d" " -f1 /proc/loadavg)
+mem=$(awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf "%d%%", (t-a)*100/t}' /proc/meminfo)
+cols=$(tput cols 2>/dev/null || echo 80)
+stamp=$(date +"%Y-%m-%d %H:%M")
+title="◆ KYBER OS // IMPERIAL TERMINAL"
+pad=$(( cols - ${#title} - ${#stamp} - 2 ))
+[ $pad -lt 2 ] && pad=2
+
+printf " ${A}%s${R}%*s${D}%s${R}\n" "$title" "$pad" "" "$stamp"
+printf " ${D}NODE${R} ${W}%s${R}   ${D}UPTIME${R} ${P}%s${R}   ${D}LOAD${R} ${P}%s${R}   ${D}MEM${R} ${P}%s${R}\n\n" \
+    "$(hostname -s)" "$up" "$load" "$mem"

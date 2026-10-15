@@ -26,42 +26,42 @@ Rectangle {
         anchors.fill: parent
         readonly property real maxD: Math.sqrt(width * width + height * height) / 2 + 60
 
+        // Every star streaks outward on the render thread (Animators), so the
+        // jump stays smooth while Plasma is busy starting up behind it.
         Repeater {
             model: 140
             Item {
                 id: star
                 readonly property real angle: (index * 137.508) % 360
-                readonly property real speed: 0.6 + ((index * 53) % 100) / 110
-                property real d: ((index * 97) % 100) / 100 * field.maxD
+                readonly property int dur: 1300 + (index * 211) % 2200
                 x: field.width / 2
                 y: field.height / 2
                 rotation: angle
 
                 Rectangle {
-                    // streak grows with distance and warp
-                    readonly property real len: 2 + star.d * (0.02 + root.warp * 0.28) * star.speed
-                    x: star.d - len
-                    y: -1
-                    width: len
+                    id: streak
+                    width: Math.max(24, field.maxD * 0.09)
                     height: 2
                     radius: 1
-                    opacity: Math.min(1, star.d / 140)
+                    transformOrigin: Item.Right
+                    scale: 0.05
+                    opacity: 0
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
                         GradientStop { position: 0.0; color: "transparent" }
                         GradientStop { position: 0.7; color: "#9fd8ff" }
                         GradientStop { position: 1.0; color: "#ffffff" }
                     }
-                }
-
-                NumberAnimation on d {
-                    id: fly
-                    from: 6
-                    to: field.maxD
-                    duration: (5200 - root.warp * 4200) / star.speed
-                    easing.type: Easing.InQuad
-                    loops: Animation.Infinite
-                    running: true
+                    ParallelAnimation {
+                        running: true
+                        loops: Animation.Infinite
+                        XAnimator { target: streak; from: 6 - streak.width; to: field.maxD; duration: star.dur; easing.type: Easing.InQuad }
+                        ScaleAnimator { target: streak; from: 0.05; to: 1.8; duration: star.dur; easing.type: Easing.InQuad }
+                        SequentialAnimation {
+                            OpacityAnimator { target: streak; from: 0; to: 1; duration: star.dur * 0.25 }
+                            PauseAnimation { duration: star.dur * 0.75 }
+                        }
+                    }
                 }
             }
         }
