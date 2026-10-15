@@ -87,6 +87,8 @@ const ease = p => 1 - Math.pow(1 - p, 3);
 // run one shader animation on an actor; onFrame(p) for extra transforms; done() at the end
 function animate(actor, Klass, ms, uniforms, onFrame, done) {
     finishRunning(actor);
+    // Muffin keeps a mapping window hidden until completed_map (the stock effects show it too)
+    actor.show();
     const fx = new Klass();
     const loc = n => fx.get_uniform_location(n);
     const lp = loc("uProgress");
