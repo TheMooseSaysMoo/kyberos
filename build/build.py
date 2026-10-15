@@ -27,6 +27,7 @@ GENERATORS = [
     "gen_sounds",
     "gen_plymouth",
     "gen_lnf",
+    "gen_kvantum",
 ]
 
 # src/ subtrees copied verbatim into dist/ (plymouth is handled by its generator)

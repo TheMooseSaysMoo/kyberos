@@ -14,11 +14,12 @@ say() { printf '\033[1;36m[kyberos]\033[0m %s\n' "$*"; }
 if [ -d "$BACKUP" ]; then
     prev=$(cat "$BACKUP/lookandfeel" 2>/dev/null || true)
     plasma-apply-lookandfeel -a "${prev:-org.fedoraproject.fedora.desktop}" >/dev/null 2>&1 || true
-    for f in "$BACKUP"/*; do
-        name=$(basename "$f")
-        [ "$name" = lookandfeel ] && continue
-        cp -a "$f" "$CONF/$name"
+    (cd "$BACKUP" && find . -type f ! -name lookandfeel) | while read -r rel; do
+        mkdir -p "$CONF/$(dirname "$rel")"
+        cp -a "$BACKUP/$rel" "$CONF/$rel"
     done
+    # no Kvantum config before KyberOS: drop ours
+    [ -f "$BACKUP/Kvantum/kvantum.kvconfig" ] || rm -f "$CONF/Kvantum/kvantum.kvconfig"
     say "restored settings from $BACKUP"
 else
     say "no backup found; switching to the Fedora look"
@@ -29,7 +30,7 @@ rm -f "$DATA"/color-schemes/KyberOS*.colors "$DATA"/konsole/KyberOS*
 rm -rf "$DATA"/aurorae/themes/KyberOS-* "$DATA"/wallpapers/KyberOS-* "$DATA"/icons/KyberOS* "$DATA/sounds/KyberOS"
 rm -rf "$DATA/plasma/desktoptheme/KyberOS" "$DATA/plasma/look-and-feel/org.kyberos.desktop" \
        "$DATA/plasma/wallpapers/org.kyberos.tactical" "$DATA/plasma/plasmoids/org.kyberos.diagnostics"
-rm -rf "$DATA"/kwin/effects/kyberos_* "$DATA/fonts/kyberos"
+rm -rf "$DATA"/kwin/effects/kyberos_* "$DATA/fonts/kyberos" "$CONF"/Kvantum/KyberOS-*
 systemctl --user disable --now kyberos-screens.service 2>/dev/null || true
 rm -f "$CONF/systemd/user/kyberos-screens.service"
 rm -f "$HOME/.local/bin/kyberos-crystal" "$HOME/.local/bin/kyberos-screens"

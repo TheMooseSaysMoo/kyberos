@@ -54,8 +54,11 @@ class Frame:
     bars: dict = field(default_factory=dict)  # side -> (paint, thickness)
     edge: int = 4                 # length of the stretched edge tiles
     margins: dict = None          # optional hint margins
+    bare_center: bool = False     # Kvantum names the fill "<prefix>", not "<prefix>-center"
 
     def eid(self, piece):
+        if piece == "center" and self.bare_center:
+            return self.prefix
         return f"{self.prefix}-{piece}" if self.prefix else piece
 
     # --- corner pieces, drawn as top-left then mirrored ---

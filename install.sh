@@ -41,6 +41,7 @@ need=()
 command -v rsvg-convert >/dev/null || need+=(librsvg2-tools)
 command -v xcursorgen >/dev/null || need+=(xcursorgen)
 command -v kwriteconfig6 >/dev/null || need+=(kf6-kconfig)
+rpm -q kvantum >/dev/null 2>&1 || need+=(kvantum)
 if [ ${#need[@]} -gt 0 ]; then
     say "installing build tools: ${need[*]} (sudo)"
     sudo dnf -y install "${need[@]}"
@@ -75,11 +76,11 @@ DIST=$HERE/dist
 # ---- back up config once -------------------------------------------------
 BACKUP=$STATE/backup-original
 CONFIGS=(kdeglobals kwinrc plasmarc kcminputrc ksplashrc kscreenlockerrc konsolerc
-         plasma-org.kde.plasma.desktop-appletsrc plasmashellrc)
+         plasma-org.kde.plasma.desktop-appletsrc plasmashellrc Kvantum/kvantum.kvconfig)
 if [ ! -d "$BACKUP" ]; then
     mkdir -p "$BACKUP"
     for c in "${CONFIGS[@]}"; do
-        [ -f "$CONF/$c" ] && cp -a "$CONF/$c" "$BACKUP/$c"
+        [ -f "$CONF/$c" ] && mkdir -p "$BACKUP/$(dirname "$c")" && cp -a "$CONF/$c" "$BACKUP/$c"
     done
     kreadconfig6 --file kdeglobals --group KDE --key LookAndFeelPackage > "$BACKUP/lookandfeel" || true
     say "backed up current settings to $BACKUP"
@@ -91,6 +92,8 @@ for sub in color-schemes aurorae konsole wallpapers icons sounds; do
     mkdir -p "$DATA/$sub"
     cp -r "$DIST/$sub/." "$DATA/$sub/"
 done
+mkdir -p "$CONF/Kvantum"
+cp -r "$DIST/Kvantum/." "$CONF/Kvantum/"
 mkdir -p "$DATA/plasma" "$DATA/kwin/effects"
 cp -r "$DIST/plasma/." "$DATA/plasma/"
 cp -r "$DIST/kwin/effects/." "$DATA/kwin/effects/"
@@ -121,6 +124,10 @@ if [ $APPLY = 1 ]; then
     w --file kdeglobals --group General --key smallestReadableFont "Exo 2,8,-1,5,500,0,0,0,0,0,0,0,0,0,0,1"
     w --file kdeglobals --group General --key fixed "Share Tech Mono,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
     w --file kdeglobals --group WM --key activeFont "Orbitron,9,-1,5,600,0,0,0,0,0,0,0,0,0,0,1"
+    # app widgets: Kvantum (chamfered steel controls) when available
+    if rpm -q kvantum >/dev/null 2>&1; then
+        w --file kdeglobals --group KDE --key widgetStyle kvantum
+    fi
     # sounds
     w --file kdeglobals --group Sounds --key Theme KyberOS
     w --file kdeglobals --group Sounds --key Enable true

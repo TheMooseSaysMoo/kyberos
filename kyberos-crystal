@@ -29,6 +29,10 @@ w --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__KyberO
 w --file kwinrc --group Effect-kyberos_open --key Accent "$hex"
 w --file kwinrc --group Effect-kyberos_wipe --key Accent "$hex"
 
+# app widgets
+[ -d "${XDG_CONFIG_HOME:-$HOME/.config}/Kvantum/KyberOS-$Cap" ] &&
+    w --file "${XDG_CONFIG_HOME:-$HOME/.config}/Kvantum/kvantum.kvconfig" --group General --key theme "KyberOS-$Cap"
+
 # terminal colours
 profile=${XDG_DATA_HOME:-$HOME/.local/share}/konsole/KyberOS.profile
 [ -f "$profile" ] && w --file "$profile" --group Appearance --key ColorScheme "KyberOS$Cap"
