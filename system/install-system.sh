@@ -40,8 +40,8 @@ fi
 chmod -R a+rX "$LOCAL/fonts" /usr/share/icons/KyberOS-* 2>/dev/null || true
 
 # ---- boot splash ----
-if command -v plymouth-set-default-theme >/dev/null; then
-    [ -f "$STATE/plymouth-previous" ] || plymouth-set-default-theme > "$STATE/plymouth-previous"
+if kyb_has_plymouth; then
+    [ -f "$STATE/plymouth-previous" ] || kyb_plymouth_get > "$STATE/plymouth-previous"
     kyb_installed "$(kyb_pkg plymouth-script)" || kyb_install $(kyb_pkg plymouth-script)
     rm -rf /usr/share/plymouth/themes/kyberos
     cp -r "$DIST/plymouth/kyberos" /usr/share/plymouth/themes/kyberos

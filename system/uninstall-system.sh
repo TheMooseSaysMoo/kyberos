@@ -12,6 +12,7 @@ if [ -f "$STATE/plymouth-previous" ]; then
     echo "[kyberos] restoring boot splash '$prev' (rebuilding initramfs)"
     kyb_plymouth_set "$prev" || echo "[kyberos] could not restore '$prev'"
 fi
+kyb_plymouth_forget kyberos
 rm -rf /usr/share/plymouth/themes/kyberos
 
 # Plasma Login Manager

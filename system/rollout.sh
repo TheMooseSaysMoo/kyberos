@@ -23,7 +23,7 @@ if [ "$(sudo -u "$U" bash -c ". '$HERE/lib/distro.sh'; kyb_desktop")" = cinnamon
 else
     pk=$(kyb_pkg rsvg xcursorgen kconfig kvantum shapes gdbus python curl fontconfig zstd)
 fi
-command -v plymouth-set-default-theme >/dev/null && pk="$pk $(kyb_pkg plymouth-script)"
+kyb_has_plymouth && pk="$pk $(kyb_pkg plymouth-script)"
 kyb_install $pk
 echo "[kyberos] building as $U"
 sudo -u "$U" -H "$HERE/install.sh" --no-apply --crystal "$CRYSTAL"

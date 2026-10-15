@@ -43,7 +43,7 @@ kyb_pkg() {
             fedora:python) echo python3 ;;          debian:python) echo python3 ;;         arch:python) echo python ;;
             # Cinnamon side: the qml runtime + modules (scene renders), xrandr, dconf
             fedora:qml) echo qt6-qtdeclarative-devel ;;
-            debian:qml) echo qt6-declarative-dev-tools qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
+            debian:qml) echo qml-qt6 qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes qml6-module-qtqml-workerscript qml6-module-qtqml-models qml6-module-qtqml ;;
             arch:qml) echo qt6-declarative ;;
             fedora:xrandr) echo xrandr ;;           debian:xrandr) echo x11-xserver-utils ;; arch:xrandr) echo xorg-xrandr ;;
             fedora:dconf) echo dconf ;;             debian:dconf) echo dconf-cli ;;         arch:dconf) echo dconf ;;
@@ -113,11 +113,38 @@ kyb_initramfs() {
     else echo "no initramfs tool found; boot splash takes effect after the next initramfs rebuild" >&2; fi
 }
 
-kyb_plymouth_set() {
-    command -v plymouth-set-default-theme >/dev/null || return 1
-    if [ "$KYB_FAMILY" = fedora ]; then
-        plymouth-set-default-theme -R "$1"       # Fedora's -R rebuilds with dracut
+# Ubuntu/Mint have no plymouth-set-default-theme: the theme is the default.plymouth alternative
+kyb_has_plymouth() {
+    command -v plymouth-set-default-theme >/dev/null || [ -e /usr/share/plymouth/themes/default.plymouth ]
+}
+
+kyb_plymouth_get() {
+    if command -v plymouth-set-default-theme >/dev/null; then
+        plymouth-set-default-theme
     else
-        plymouth-set-default-theme "$1" && kyb_initramfs
+        basename "$(dirname "$(readlink -f /usr/share/plymouth/themes/default.plymouth)")"
     fi
+}
+
+kyb_plymouth_set() {
+    if command -v plymouth-set-default-theme >/dev/null; then
+        if [ "$KYB_FAMILY" = fedora ]; then
+            plymouth-set-default-theme -R "$1"       # Fedora's -R rebuilds with dracut
+        else
+            plymouth-set-default-theme "$1" && kyb_initramfs
+        fi
+    elif command -v update-alternatives >/dev/null && [ -f "/usr/share/plymouth/themes/$1/$1.plymouth" ]; then
+        local f=/usr/share/plymouth/themes/$1/$1.plymouth
+        update-alternatives --query default.plymouth 2>/dev/null | grep -qx "Alternative: $f" ||
+            update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$f" 100 >/dev/null
+        update-alternatives --set default.plymouth "$f" >/dev/null && kyb_initramfs
+    else
+        return 1
+    fi
+}
+
+# drop KyberOS from the alternatives again (Ubuntu/Mint), after switching back
+kyb_plymouth_forget() {
+    command -v update-alternatives >/dev/null || return 0
+    update-alternatives --remove default.plymouth "/usr/share/plymouth/themes/$1/$1.plymouth" >/dev/null 2>&1 || true
 }

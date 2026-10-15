@@ -19,7 +19,7 @@ say() { printf '\033[1;35m[snapshot-system]\033[0m %s\n' "$*"; }
 
 say "archiving system config -> $OUT"
 paths=()
-theme=$(plymouth-set-default-theme 2>/dev/null || true)
+theme=$(kyb_plymouth_get 2>/dev/null || true)
 [ -n "$theme" ] && [ -d "/usr/share/plymouth/themes/$theme" ] && paths+=("/usr/share/plymouth/themes/$theme")
 for p in /etc/plymouth /etc/plasmalogin.conf /etc/plasmalogin.conf.d /var/lib/plasmalogin \
          /etc/default/grub /usr/local/share /etc/sddm.conf /etc/sddm.conf.d /var/lib/sddm/.config \
