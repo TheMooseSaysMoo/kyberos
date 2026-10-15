@@ -242,9 +242,9 @@ Item {
             model: 14
             Rectangle {
                 id: led
-                readonly property var palette: [s.accent, s.accent, s.phosphor, s.amber, "#ff3b2f", "#566476"]
+                readonly property var ledColours: [s.accent, s.accent, s.phosphor, s.amber, "#ff3b2f", "#566476"]
                 width: s.u * 0.012; height: s.u * 0.006
-                color: palette[(index * 7 + 3) % palette.length]
+                color: ledColours[(index * 7 + 3) % ledColours.length]
                 SequentialAnimation {
                     loops: Animation.Infinite; running: s.animate
                     PauseAnimation { duration: 400 + (index * 733) % 2900 }

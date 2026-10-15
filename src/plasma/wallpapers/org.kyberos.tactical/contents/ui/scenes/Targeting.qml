@@ -65,9 +65,9 @@ Item {
             id: rib
             readonly property real d: 16 - index - s.phase + 1     // 1..16
             readonly property real t: 1 / d                          // 0..1 (near = 1)
-            readonly property real y: s.vy + (s.height - s.vy) * t
-            readonly property real half: s.halfAt(y)
-            readonly property real wall: s.wallTop + (s.wallTop * 13) * (y - s.vy) / (s.height - s.vy)
+            readonly property real ry: s.vy + (s.height - s.vy) * t
+            readonly property real half: s.halfAt(ry)
+            readonly property real wall: s.wallTop + (s.wallTop * 13) * (ry - s.vy) / (s.height - s.vy)
             opacity: Math.min(1, t * 3)
             Shape {
                 ShapePath {
@@ -75,8 +75,8 @@ Item {
                     strokeWidth: Math.max(1, 2.5 * rib.t)
                     fillColor: "transparent"
                     PathPolyline {
-                        path: [Qt.point(s.vx - rib.half, rib.y - rib.wall), Qt.point(s.vx - rib.half, rib.y),
-                               Qt.point(s.vx + rib.half, rib.y), Qt.point(s.vx + rib.half, rib.y - rib.wall)]
+                        path: [Qt.point(s.vx - rib.half, rib.ry - rib.wall), Qt.point(s.vx - rib.half, rib.ry),
+                               Qt.point(s.vx + rib.half, rib.ry), Qt.point(s.vx + rib.half, rib.ry - rib.wall)]
                     }
                 }
             }
@@ -145,16 +145,16 @@ Item {
         model: 2
         Column {
             id: rulerCol
-            readonly property bool left: index === 0
+            readonly property bool onLeft: index === 0
             width: s.u * 0.04
-            x: left ? s.width * 0.05 : s.width * 0.95 - width
+            x: onLeft ? s.width * 0.05 : s.width * 0.95 - width
             y: s.height * 0.42
             spacing: s.u * 0.018
             Repeater {
                 model: 18
                 Rectangle {
                     width: (index % 5 === 0 ? 1 : 0.5) * rulerCol.width
-                    x: rulerCol.left ? 0 : rulerCol.width - width
+                    x: rulerCol.onLeft ? 0 : rulerCol.width - width
                     height: 2
                     color: s.accent
                     opacity: 0.55
