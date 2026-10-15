@@ -150,6 +150,9 @@ cin_apply() {
         "@as []"|"[]") $gs org.cinnamon enabled-extensions "['kyberos-effects@kyberos']" ;;
         *) $gs org.cinnamon enabled-extensions "${ext%]}, 'kyberos-effects@kyberos']" ;;
     esac
+    # (re)load it now: Cinnamon doesn't retry an extension that failed earlier in the session
+    gdbus call --session --dest org.Cinnamon --object-path /org/Cinnamon \
+        --method org.Cinnamon.ReloadXlet kyberos-effects@kyberos EXTENSION >/dev/null 2>&1 || true
     [ $LAYOUT = 1 ] && cin_layout
     "$HOME/.local/bin/kyberos-crystal" "$CRYSTAL" --quiet
     # per-monitor wallpaper now, and re-rendered whenever monitors change

@@ -35,10 +35,14 @@ function shaderSource(name) {
     return { decl, code };
 }
 
+let loadId = 0;
+
 function makeClass(name) {
     const src = shaderSource(name);
-    // GLSLEffect caches one pipeline per class, so each shader gets its own class
-    return GObject.registerClass(class extends Cinnamon.GLSLEffect {
+    // GLSLEffect caches one pipeline per class, so each shader gets its own class. Anonymous
+    // classes would all get the same auto GType name, and a re-enable registers them again,
+    // hence the explicit, per-load unique names.
+    return GObject.registerClass({ GTypeName: `KyberOSFx_${name}_${loadId}_${Date.now()}` }, class extends Cinnamon.GLSLEffect {
         vfunc_build_pipeline() {
             this.add_glsl_snippet(Cinnamon.SnippetHook.FRAGMENT, src.decl, src.code, false);
         }
@@ -189,6 +193,7 @@ function init(metadata) {
 
 function enable() {
     if (!classes) {
+        loadId++;
         classes = { projector: makeClass("projector"), hologram: makeClass("hologram"), powerdown: makeClass("powerdown") };
     }
     const wm = global.window_manager;
