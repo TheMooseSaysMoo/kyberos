@@ -19,14 +19,15 @@ logo.SetOpacity(0);
 
 // ---- starfield ----
 NSTARS = 110;
-streaks[0] = Image("streak0.png");
-streaks[1] = Image("streak1.png");
-streaks[2] = Image("streak2.png");
-streaks[3] = Image("streak3.png");
+NANGLES = 36;   // streak images are pre-rotated in 10 degree steps
+for (k = 0; k < 4; k++)
+    for (b = 0; b < NANGLES; b++)
+        streaks[k][b] = Image("streak" + k + "_" + b + ".png");
 
 // assignments inside a function are local unless written through global.
 fun spawn(i, near) {
-    global.star[i].angle = Math.Random() * 2 * Math.Pi;
+    global.star[i].bucket = Math.Min(NANGLES - 1, Math.Int(Math.Random() * NANGLES));
+    global.star[i].angle = global.star[i].bucket * 2 * Math.Pi / NANGLES;
     if (near)
         global.star[i].dist = 8 + Math.Random() * 40;
     else
@@ -38,7 +39,7 @@ fun spawn(i, near) {
 for (i = 0; i < NSTARS; i++) {
     spawn(i, 0);
     for (k = 0; k < 4; k++)
-        star[i].img[k] = streaks[k].Rotate(star[i].angle);
+        star[i].img[k] = streaks[k][star[i].bucket];
     star[i].sprite = Sprite();
     star[i].sprite.SetZ(5);
 }

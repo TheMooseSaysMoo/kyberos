@@ -16,14 +16,17 @@ def svg(w, h, body):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">{body}</svg>'
 
 
-def streak(length, a):
-    # square canvas: Plymouth's Image.Rotate keeps the original bounds, so a
-    # thin strip would be clipped away at most angles
+STREAK_LENGTHS = [6, 22, 60, 150]
+STREAK_ANGLES = 36   # pre-rotated in 10 degree steps: Plymouth's Image.Rotate returns empty images here
+
+
+def streak(length, a, deg):
+    """Streak pointing outward at `deg`, centred on a square canvas."""
     n = length + 8
-    y = n / 2 - 1
+    c = n / 2
     return svg(n, n, f'<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="{a}" stop-opacity="0"/>'
                      f'<stop offset="0.7" stop-color="{mix(a, "#ffffff", 0.5)}" stop-opacity="0.8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>'
-                     f'<rect x="4" y="{y}" width="{length}" height="2" rx="1" fill="url(#g)"/>')
+                     f'<g transform="rotate({deg} {c} {c})"><rect x="4" y="{c - 1}" width="{length}" height="2" rx="1" fill="url(#g)"/></g>')
 
 
 def generate(out):
@@ -34,10 +37,6 @@ def generate(out):
         shutil.copy(f, d / f.name)
     images = {
         "logo": svg(1000, 200, crystal_svg(70, 100, 150, a) + wordmark(560, 100, 9.0, TEXT, a)),
-        "streak0": streak(6, a),
-        "streak1": streak(22, a),
-        "streak2": streak(60, a),
-        "streak3": streak(150, a),
         "hilt": svg(84, 20, f'<rect x="0" y="5" width="70" height="10" fill="#9aa6b5"/><rect x="6" y="3" width="6" height="14" fill="{BEVEL}"/>'
                             f'<rect x="22" y="4" width="3" height="12" fill="{EDGE}"/><rect x="28" y="4" width="3" height="12" fill="{EDGE}"/>'
                             f'<rect x="40" y="7" width="12" height="6" fill="{ALERT}"/><rect x="64" y="2" width="20" height="16" fill="#c5ced8"/>'),
@@ -48,6 +47,9 @@ def generate(out):
         "entry": svg(420, 44, f'<path d="M 1 9 L 9 1 H 419 V 35 L 411 43 H 1 Z" fill="{VOID}" fill-opacity="0.9" stroke="{a}" stroke-width="2"/>'),
         "bullet": svg(14, 14, f'<polygon points="7,0 14,7 7,14 0,7" fill="{a}"/>'),
     }
+    for k, length in enumerate(STREAK_LENGTHS):
+        for b in range(STREAK_ANGLES):
+            images[f"streak{k}_{b}"] = streak(length, a, b * 360 / STREAK_ANGLES)
     for name, body in images.items():
         src = d / f"{name}.svg"
         src.write_text(body)
