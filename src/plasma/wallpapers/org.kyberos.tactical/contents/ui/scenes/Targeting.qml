@@ -13,7 +13,7 @@ Item {
     property color accent: "#33b5ff"
     property bool animate: true
     readonly property color amber: "#ffb02e"
-    readonly property color data: "#a6f2c4"
+    readonly property color phosphor: "#a6f2c4"
     readonly property real u: Math.min(width, height)
     readonly property string mono: "Share Tech Mono"
 
@@ -94,7 +94,7 @@ Item {
         x: s.vx; y: s.vy - s.wallTop * 0.5
         readonly property real gap: s.u * (0.04 + 0.22 * Math.max(0, 1 - s.run / 0.82))
         readonly property real arm: s.u * 0.06
-        readonly property color c: s.locked ? s.amber : s.data
+        readonly property color c: s.locked ? s.amber : s.phosphor
         Repeater {
             model: [[-1, -1], [1, -1], [-1, 1], [1, 1]]
             Shape {
@@ -123,14 +123,14 @@ Item {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "RANGE  " + s.range.toFixed(2).padStart(5, "0") + "  KM"
-            color: s.locked ? s.amber : s.data
+            color: s.locked ? s.amber : s.phosphor
             font.family: s.mono; font.pixelSize: Math.max(16, s.u * 0.045); font.letterSpacing: 4
         }
         Text {
             id: lockText
             anchors.horizontalCenter: parent.horizontalCenter
             text: s.locked ? "TARGET LOCKED" : "ACQUIRING"
-            color: s.locked ? s.amber : Qt.rgba(s.data.r, s.data.g, s.data.b, 0.6)
+            color: s.locked ? s.amber : Qt.rgba(s.phosphor.r, s.phosphor.g, s.phosphor.b, 0.6)
             font.family: s.mono; font.pixelSize: Math.max(12, s.u * 0.024); font.letterSpacing: 6
             SequentialAnimation {
                 loops: Animation.Infinite; running: s.animate

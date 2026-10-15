@@ -12,7 +12,7 @@ Item {
     property color accent: "#33b5ff"
     property bool animate: true
     readonly property color amber: "#ffb02e"
-    readonly property color data: "#a6f2c4"
+    readonly property color phosphor: "#a6f2c4"
     readonly property real u: Math.min(width, height)
     readonly property bool portrait: height >= width
     readonly property string mono: "Share Tech Mono"
@@ -94,7 +94,7 @@ Item {
                 }
             }
             ShapePath {   // trace
-                strokeColor: s.data; strokeWidth: 2; fillColor: "transparent"
+                strokeColor: s.phosphor; strokeWidth: 2; fillColor: "transparent"
                 PathPolyline {
                     path: {
                         var pts = [], n = 140
@@ -114,7 +114,7 @@ Item {
         Text {
             anchors.left: parent.left; anchors.bottom: parent.top; anchors.bottomMargin: 4
             text: "CARRIER 14.207 GHZ   SNR 31 DB"
-            color: s.data; opacity: 0.75; font.family: s.mono; font.pixelSize: Math.max(10, s.u * 0.016); font.letterSpacing: 3
+            color: s.phosphor; opacity: 0.75; font.family: s.mono; font.pixelSize: Math.max(10, s.u * 0.016); font.letterSpacing: 3
         }
     }
 
@@ -152,7 +152,7 @@ Item {
                             model: 2
                             Text {
                                 text: col.glyphs
-                                color: index % 2 ? s.data : s.accent
+                                color: index % 2 ? s.phosphor : s.accent
                                 opacity: 0.7
                                 font.family: s.mono
                                 font.pixelSize: Math.max(10, s.u * 0.02)

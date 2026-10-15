@@ -14,7 +14,7 @@ Item {
     property bool animate: true
     property int sweepSeconds: 6
     readonly property color amber: "#ffb02e"
-    readonly property color data: "#a6f2c4"
+    readonly property color phosphor: "#a6f2c4"
     readonly property real u: Math.min(width, height)
     readonly property bool portrait: height > width
 
@@ -242,7 +242,7 @@ Item {
             model: 14
             Rectangle {
                 id: led
-                readonly property var palette: [s.accent, s.accent, s.data, s.amber, "#ff3b2f", "#566476"]
+                readonly property var palette: [s.accent, s.accent, s.phosphor, s.amber, "#ff3b2f", "#566476"]
                 width: s.u * 0.012; height: s.u * 0.006
                 color: palette[(index * 7 + 3) % palette.length]
                 SequentialAnimation {
@@ -257,7 +257,7 @@ Item {
     }
     Readout {
         x: s.width * 0.05; y: s.height * 0.09 + s.u * 0.022
-        colour: s.data; rows: 5; rowHeight: s.u * 0.009; barWidth: s.u * 0.2; seed: 2; animate: s.animate
+        colour: s.phosphor; rows: 5; rowHeight: s.u * 0.009; barWidth: s.u * 0.2; seed: 2; animate: s.animate
     }
     Readout {
         anchors.right: parent.right; anchors.rightMargin: s.width * 0.06

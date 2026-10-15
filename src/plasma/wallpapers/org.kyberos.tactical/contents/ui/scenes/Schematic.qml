@@ -12,7 +12,7 @@ Item {
     property color accent: "#33b5ff"
     property bool animate: true
     readonly property color amber: "#ffb02e"
-    readonly property color data: "#a6f2c4"
+    readonly property color phosphor: "#a6f2c4"
     readonly property real u: Math.min(width, height)
     readonly property bool portrait: height > width
     readonly property string mono: "Share Tech Mono"
@@ -123,14 +123,14 @@ Item {
             readonly property point tip: Qt.point(at.x + modelData.dx * s.u, at.y + modelData.dy * s.u)
             Shape {
                 ShapePath {
-                    strokeColor: Qt.rgba(s.data.r, s.data.g, s.data.b, 0.7); strokeWidth: 1; fillColor: "transparent"
+                    strokeColor: Qt.rgba(s.phosphor.r, s.phosphor.g, s.phosphor.b, 0.7); strokeWidth: 1; fillColor: "transparent"
                     PathPolyline { path: [callout.at, callout.tip, Qt.point(callout.tip.x + (modelData.dx < 0 ? -1 : 1) * s.u * 0.05, callout.tip.y)] }
                 }
             }
-            Rectangle { x: callout.at.x - 3; y: callout.at.y - 3; width: 6; height: 6; color: s.data }
+            Rectangle { x: callout.at.x - 3; y: callout.at.y - 3; width: 6; height: 6; color: s.phosphor }
             Text {
                 text: modelData.label
-                color: s.data
+                color: s.phosphor
                 font.family: s.mono
                 font.pixelSize: Math.max(11, s.u * 0.016)
                 font.letterSpacing: 2
@@ -182,8 +182,8 @@ Item {
         x: s.width * 0.05; y: s.height * 0.08
         spacing: s.u * 0.006
         Text { text: "SCHEMATIC  //  CLASS II CRUISER"; color: s.accent; font.family: s.mono; font.pixelSize: Math.max(13, s.u * 0.02); font.letterSpacing: 4 }
-        Text { text: "DECK PLAN 07-G   REV 4"; color: s.data; opacity: 0.7; font.family: s.mono; font.pixelSize: Math.max(10, s.u * 0.013); font.letterSpacing: 3 }
-        Readout { colour: s.data; rows: 4; rowHeight: s.u * 0.008; barWidth: s.u * 0.2; seed: 11; animate: s.animate }
+        Text { text: "DECK PLAN 07-G   REV 4"; color: s.phosphor; opacity: 0.7; font.family: s.mono; font.pixelSize: Math.max(10, s.u * 0.013); font.letterSpacing: 3 }
+        Readout { colour: s.phosphor; rows: 4; rowHeight: s.u * 0.008; barWidth: s.u * 0.2; seed: 11; animate: s.animate }
     }
     Readout {
         anchors.right: parent.right; anchors.rightMargin: s.width * 0.05
