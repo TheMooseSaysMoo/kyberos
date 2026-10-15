@@ -74,7 +74,7 @@ kbuildsycoca6 >/dev/null 2>&1 || true
 
 # Cinnamon/GNOME settings live in dconf: load the dumps taken with the snapshot
 if command -v dconf >/dev/null && ls "$SNAP"/state/dconf-*.ini >/dev/null 2>&1; then
-    cp=$(pgrep -u "$(id -u)" -x cinnamon | head -1 || true)
+    cp=""; for c in $(pgrep -u "$(id -u)" -x cinnamon); do [ -r "/proc/$c/environ" ] && { cp=$c; break; }; done   # skip zombies
     [ -n "$cp" ] && while IFS= read -r -d '' kv; do
         case ${kv%%=*} in DISPLAY|XAUTHORITY|DBUS_SESSION_BUS_ADDRESS) export "$kv" ;; esac
     done < "/proc/$cp/environ"

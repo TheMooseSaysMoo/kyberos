@@ -23,7 +23,7 @@ desktop=${KYBEROS_DESKTOP:-}
 [ -n "$desktop" ] || case "${XDG_CURRENT_DESKTOP:-}" in *Cinnamon*) desktop=cinnamon ;; *KDE*|*Plasma*) desktop=plasma ;; esac
 [ -n "$desktop" ] || { pgrep -u "$(id -u)" -x cinnamon >/dev/null && desktop=cinnamon || desktop=plasma; }
 if [ "$desktop" = cinnamon ]; then
-    cp=$(pgrep -u "$(id -u)" -x cinnamon | head -1 || true)
+    cp=""; for c in $(pgrep -u "$(id -u)" -x cinnamon); do [ -r "/proc/$c/environ" ] && { cp=$c; break; }; done   # skip zombies
     [ -n "$cp" ] && while IFS= read -r -d '' kv; do
         name=${kv%%=*}
         case $name in DISPLAY|XAUTHORITY|DBUS_SESSION_BUS_ADDRESS) [ -z "${!name:-}" ] && export "$kv" ;; esac

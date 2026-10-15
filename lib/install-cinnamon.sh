@@ -6,7 +6,7 @@
 cin_session_env() {
     # from ssh/a tty: borrow the running Cinnamon session's display + bus
     local cp kv name
-    cp=$(pgrep -u "$(id -u)" -x cinnamon | head -1 || true)
+    cp=""; for c in $(pgrep -u "$(id -u)" -x cinnamon); do [ -r "/proc/$c/environ" ] && { cp=$c; break; }; done   # skip zombies
     [ -n "$cp" ] || return 0
     while IFS= read -r -d '' kv; do
         name=${kv%%=*}
