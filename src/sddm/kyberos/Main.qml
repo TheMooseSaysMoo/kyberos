@@ -83,7 +83,7 @@ Item {
         readonly property real cx: root.width > root.height * 1.3 ? root.width * 0.3 : root.width * 0.5
         anchors.horizontalCenter: parent.left
         anchors.horizontalCenterOffset: cx
-        y: root.height * 0.5 - height * 0.4
+        y: root.height * 0.44 - height / 2
         readonly property real cut: root.u * 0.018
 
         Plate { anchors.fill: parent; cut: panel.cut; stroke: root.accent; fill: Qt.rgba(0.024, 0.031, 0.043, 0.86) }
