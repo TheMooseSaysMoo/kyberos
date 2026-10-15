@@ -86,16 +86,21 @@ StEntry:focus, #menu-search-entry:focus {{ border: 1px solid {a}; }}
 .calendar-today {{ background-color: {rgba(a, 0.3)}; border: 1px solid {a}; border-radius: 0; color: {TEXT}; }}
 .calendar-day-base:hover {{ background-color: {rgba(a, 0.18)}; border-radius: 0; }}
 
-/* dialogs: POWER SYSTEMS / run / polkit */
-.cinnamon-modal-dialog, .modal-dialog {{ background-color: {rgba(VOID, 0.96)}; border: 1px solid {BEVEL}; border-top: 2px solid {a};
-  border-radius: 0; color: {TEXT}; }}
-.end-session-dialog {{ border-radius: 0; }}
-.end-session-dialog-subject, .confirm-dialog-title, .dialog-header, .modal-dialog .headline {{ font-family: "{FONTS['title']}"; letter-spacing: 3px; color: {a}; }}
-.modal-dialog-button, .dialog-button {{ border-radius: 0; background-color: {STEEL}; border: 1px solid {BEVEL};
-  font-family: "{FONTS['ui']}"; font-weight: 600; letter-spacing: 1px; min-width: 110px; padding: 8px 18px; }}
-.modal-dialog-button:hover, .dialog-button:hover {{ background-color: {RAISED}; border-color: {a}; }}
-.modal-dialog-button:focus, .dialog-button:focus {{ border: 1px solid {a}; }}
-.modal-dialog-button:active, .dialog-button:active {{ background-color: {rgba(a, 0.35)}; }}
+/* dialogs (logout/shutdown "POWER SYSTEMS", run, polkit): Cinnamon 6 uses .dialog / .dialog-button.
+   Buttons stay at normal weight: St measures variable fonts at regular weight, so bold ellipsizes. */
+.dialog, .cinnamon-modal-dialog, .modal-dialog {{ background-color: {rgba(VOID, 0.96)}; border: 1px solid {BEVEL};
+  border-top: 2px solid {a}; border-radius: 0; color: {TEXT}; }}
+.message-dialog-content .message-dialog-title, .dialog .confirm-dialog-title, .end-session-dialog-subject,
+.dialog-header {{ font-family: "{FONTS['title']}"; font-weight: normal; letter-spacing: 3px; color: {a}; }}
+.dialog .dialog-button, .dialog .dialog-button:destructive-action, .dialog .dialog-button:default,
+.modal-dialog-button {{ border-radius: 0; background-color: {STEEL}; border: 1px solid {BEVEL};
+  font-family: "{FONTS['ui']}"; font-weight: normal; letter-spacing: 1px; color: {TEXT}; padding: 10px 22px; }}
+.dialog .dialog-button:hover, .modal-dialog-button:hover {{ background-color: {RAISED}; border: 1px solid {a}; color: {TEXT}; }}
+.dialog .dialog-button:focus, .modal-dialog-button:focus {{ border: 1px solid {a}; }}
+.dialog .dialog-button:active, .dialog .dialog-button:checked {{ background-color: {rgba(a, 0.35)}; }}
+.dialog .dialog-button:default {{ border: 1px solid {AMBER}; color: {AMBER}; }}
+.dialog .dialog-button:destructive-action {{ border: 1px solid {ALERT}; color: {ALERT}; }}
+.dialog .dialog-button:destructive-action:hover {{ background-color: {ALERT}; color: #ffffff; }}
 
 /* notifications and OSD */
 .notification, #notification {{ border-radius: 0; background-color: {rgba(VOID, 0.96)}; border: 1px solid {BEVEL}; border-left: 3px solid {a}; }}
