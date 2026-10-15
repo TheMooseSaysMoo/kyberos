@@ -20,11 +20,10 @@ Item {
     // ship drawing box (nose points right in landscape, up in portrait)
     Item {
         id: ship
-        readonly property real len: s.portrait ? Math.min(s.height * 0.62, s.width * 2.2) : Math.min(s.width * 0.62, s.height * 1.55)
+        readonly property real len: s.portrait ? Math.min(s.height * 0.55, s.width * 1.9) : Math.min(s.width * 0.55, s.height * 1.25)
         readonly property real wid: len * 0.4
         width: len; height: wid
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: s.portrait ? 0 : -s.height * 0.03
         rotation: s.portrait ? -90 : 0
 
         function pts(list) { return Geo.scale(list, ship.len, ship.wid, 0, 0) }
@@ -106,25 +105,27 @@ Item {
     function shipPoint(nx, ny) {
         var lx = (nx - 0.5) * ship.len, ly = (ny - 0.5) * ship.wid
         var a = ship.rotation * Math.PI / 180
-        var cx = s.width / 2, cy = s.height / 2 + (s.portrait ? 0 : -s.height * 0.03)
+        var cx = s.width / 2, cy = s.height / 2
         return Qt.point(cx + lx * Math.cos(a) - ly * Math.sin(a), cy + lx * Math.sin(a) + ly * Math.cos(a))
     }
     Repeater {
         model: [
-            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, dx: 0.03, dy: -0.22 },
-            { label: "MAIN REACTOR", nx: 0.3, ny: 0.5, dx: 0.02, dy: 0.3 },
-            { label: "HANGAR 02", nx: 0.5, ny: 0.56, dx: 0.12, dy: 0.24 },
-            { label: "SHIELD GENERATOR", nx: 0.62, ny: 0.32, dx: 0.12, dy: -0.2 },
-            { label: "ION DRIVE ARRAY", nx: 0.035, ny: 0.64, dx: -0.1, dy: 0.22 },
+            // feature point (nx, ny) and label anchor (lx, ly) in ship coordinates:
+            // labels live in the lanes above (ly < 0) and below (ly > 1) the hull
+            { label: "BRIDGE TOWER", nx: 0.15, ny: 0.4, lx: 0.1, ly: -0.16 },
+            { label: "SHIELD GENERATOR", nx: 0.62, ny: 0.32, lx: 0.62, ly: -0.16 },
+            { label: "ION DRIVE ARRAY", nx: 0.035, ny: 0.64, lx: 0.0, ly: 1.14 },
+            { label: "MAIN REACTOR", nx: 0.3, ny: 0.5, lx: 0.32, ly: 1.14 },
+            { label: "HANGAR 02", nx: 0.5, ny: 0.56, lx: 0.62, ly: 1.14 },
         ]
         Item {
             id: callout
             readonly property point at: s.shipPoint(modelData.nx, modelData.ny)
-            readonly property point tip: Qt.point(at.x + modelData.dx * s.u, at.y + modelData.dy * s.u)
+            readonly property point tip: s.shipPoint(modelData.lx, modelData.ly)
             Shape {
                 ShapePath {
                     strokeColor: Qt.rgba(s.phosphor.r, s.phosphor.g, s.phosphor.b, 0.7); strokeWidth: 1; fillColor: "transparent"
-                    PathPolyline { path: [callout.at, callout.tip, Qt.point(callout.tip.x + (modelData.dx < 0 ? -1 : 1) * s.u * 0.05, callout.tip.y)] }
+                    PathPolyline { path: [callout.at, callout.tip, Qt.point(callout.tip.x + s.u * 0.04, callout.tip.y)] }
                 }
             }
             Rectangle { x: callout.at.x - 3; y: callout.at.y - 3; width: 6; height: 6; color: s.phosphor }
@@ -134,7 +135,7 @@ Item {
                 font.family: s.mono
                 font.pixelSize: Math.max(11, s.u * 0.016)
                 font.letterSpacing: 2
-                x: modelData.dx < 0 ? callout.tip.x - s.u * 0.05 - implicitWidth : callout.tip.x + s.u * 0.006
+                x: callout.tip.x + s.u * 0.006
                 y: callout.tip.y - implicitHeight - 2
             }
             SequentialAnimation {
@@ -151,8 +152,8 @@ Item {
     Shape {
         id: ruler
         anchors.fill: parent
-        readonly property point a: s.shipPoint(0, 1.18)
-        readonly property point b: s.shipPoint(1, 1.18)
+        readonly property point a: s.shipPoint(0, 1.36)
+        readonly property point b: s.shipPoint(1, 1.36)
         ShapePath {
             strokeColor: Qt.rgba(s.accent.r, s.accent.g, s.accent.b, 0.6); strokeWidth: 1; fillColor: "transparent"
             PathMultiline {
