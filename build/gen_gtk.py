@@ -130,7 +130,7 @@ headerbar, .titlebar {{ background: {STEEL}; border-bottom: 1px solid alpha({a},
 headerbar .title, .titlebar .title {{ font-family: "{FONTS['title']}"; font-weight: 600; letter-spacing: 2px; }}
 headerbar .subtitle {{ font-family: "{FONTS['mono']}"; color: {DIM}; }}
 
-button:not(.flat):not(.titlebutton):not(.circular):not(.image-button.flat) {{ {bi("btn-normal")} }}
+button:not(.flat):not(.titlebutton):not(.circular) {{ {bi("btn-normal")} }}
 button:not(.flat):not(.titlebutton):not(.circular):hover {{ {bi("btn-hover")} }}
 button:not(.flat):not(.titlebutton):not(.circular):active,
 button:not(.flat):not(.titlebutton):not(.circular):checked {{ {bi("btn-active")} }}
