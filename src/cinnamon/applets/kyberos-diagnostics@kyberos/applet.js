@@ -56,12 +56,14 @@ class KyberDiagnostics extends Applet.Applet {
         this.menu = new Applet.AppletPopupMenu(this, orientation);
         this._menuManager.addMenu(this.menu);
         const head = new PopupMenu.PopupMenuItem("SHIP DIAGNOSTICS", { reactive: false });
-        head.label.style = "font-family: Michroma; letter-spacing: 3px; font-size: 9pt;";
+        head.label.style = "font-family: Michroma; letter-spacing: 3px; font-size: 9pt; min-width: 300px;";
         this.menu.addMenuItem(head);
         this._rows = {};
         for (const k of ["CPU", "CPU TEMP", "CPU CORES", "GPU", "RAM", "DISK", "NETWORK", "DISK I/O"]) {
             const item = new PopupMenu.PopupMenuItem(k, { reactive: false });
-            item.label.style = "font-family: 'Share Tech Mono'; color: #a6f2c4;";
+            // fixed width: the menu sizes itself before the readings arrive and would ellipsize them
+            item.label.style = "font-family: 'Share Tech Mono'; color: #a6f2c4; min-width: 300px;";
+            item.label.clutter_text.ellipsize = 0;
             this.menu.addMenuItem(item);
             this._rows[k] = item;
         }

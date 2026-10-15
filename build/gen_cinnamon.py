@@ -90,9 +90,9 @@ StEntry:focus, #menu-search-entry:focus {{ border: 1px solid {a}; }}
 .cinnamon-modal-dialog, .modal-dialog {{ background-color: {rgba(VOID, 0.96)}; border: 1px solid {BEVEL}; border-top: 2px solid {a};
   border-radius: 0; color: {TEXT}; }}
 .end-session-dialog {{ border-radius: 0; }}
-.end-session-dialog-subject, .confirm-dialog-title, .dialog-header {{ font-family: "{FONTS['title']}"; letter-spacing: 3px; color: {a}; }}
+.end-session-dialog-subject, .confirm-dialog-title, .dialog-header, .modal-dialog .headline {{ font-family: "{FONTS['title']}"; letter-spacing: 3px; color: {a}; }}
 .modal-dialog-button, .dialog-button {{ border-radius: 0; background-color: {STEEL}; border: 1px solid {BEVEL};
-  font-family: "{FONTS['heading']}"; letter-spacing: 1px; }}
+  font-family: "{FONTS['ui']}"; font-weight: 600; letter-spacing: 1px; min-width: 110px; padding: 8px 18px; }}
 .modal-dialog-button:hover, .dialog-button:hover {{ background-color: {RAISED}; border-color: {a}; }}
 .modal-dialog-button:focus, .dialog-button:focus {{ border: 1px solid {a}; }}
 .modal-dialog-button:active, .dialog-button:active {{ background-color: {rgba(a, 0.35)}; }}
