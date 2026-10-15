@@ -16,7 +16,7 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
 | Sounds | `build/gen_sounds.py` | `sounds/KyberOS` | synthesised WAVs, no film audio |
 | Global theme | `src/plasma/look-and-feel/org.kyberos.desktop` | `plasma/look-and-feel/` | defaults, panel layout, hyperspace KSplash |
 | Diagnostics widget | `src/plasma/plasmoids/org.kyberos.diagnostics` | `plasma/plasmoids/` | reactor = CPU, shields = RAM, targeting = GPU, hull = CPU temp, comms = net |
-| Blast doors / hologram | `src/kwin/effects/kyberos_open` | `kwin/effects/` | JS effect + GLSL; normal windows get doors, dialogs/notifications a hologram |
+| Holoprojector | `src/kwin/effects/kyberos_open` | `kwin/effects/` | JS effect + GLSL; windows fly out of their dock icon as a hologram, dialogs/notifications materialise in place, every close powers down to a line then a point |
 | Desktop wipe | `src/kwin/effects/kyberos_wipe` | `kwin/effects/` | edge wipe between virtual desktops |
 | Boot splash | `build/gen_plymouth.py` + `src/plymouth/kyberos` | `/usr/share/plymouth/themes/kyberos` | `--system`; rebuilds initramfs |
 | Login greeter | `system/install-system.sh` | `/usr/local/share`, `/etc/plasmalogin.conf.d/50-kyberos.conf`, `/var/lib/plasmalogin/.config` | `--system`; Plasma Login Manager has no QML theme hook, so it is styled via style/colours/fonts + the tactical wallpaper |

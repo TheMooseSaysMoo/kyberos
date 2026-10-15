@@ -1,13 +1,17 @@
 {
     "KPackageStructure": "KWin/Effect",
     "KPlugin": {
-        "Authors": [{ "Name": "KyberOS" }],
+        "Authors": [
+            {
+                "Name": "KyberOS"
+            }
+        ],
         "Category": "Window Open/Close Animation",
-        "Description": "Windows open behind sliding blast doors; dialogs and notifications materialise as holograms",
+        "Description": "Windows are projected out of their dock icon as holograms and power down to a point when closed",
         "EnabledByDefault": false,
         "Id": "kyberos_open",
         "License": "GPL-3.0-or-later",
-        "Name": "KyberOS Blast Doors"
+        "Name": "KyberOS Holoprojector"
     },
     "X-KDE-ConfigModule": "kcm_kwin4_genericscripted",
     "X-KDE-Ordering": 60,

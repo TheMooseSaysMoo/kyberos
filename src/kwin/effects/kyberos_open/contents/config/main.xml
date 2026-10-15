@@ -4,9 +4,9 @@
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
   <kcfgfile name="kwinrc"/>
   <group name="Effect-kyberos_open">
-    <entry name="DoorOpenDuration" type="UInt"><default>460</default></entry>
-    <entry name="DoorCloseDuration" type="UInt"><default>320</default></entry>
+    <entry name="ProjectDuration" type="UInt"><default>480</default></entry>
     <entry name="HologramDuration" type="UInt"><default>380</default></entry>
+    <entry name="PowerDownDuration" type="UInt"><default>320</default></entry>
     <entry name="Accent" type="String"><default>#33b5ff</default></entry>
   </group>
 </kcfg>
