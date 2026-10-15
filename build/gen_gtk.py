@@ -120,6 +120,16 @@ def border_image(name, gtk4):
             f'border-color: transparent; background: none; box-shadow: none;')
 
 
+def wbtn(state, only=None):
+    """Selector list for every window button class in GTK 3 title bars and GTK 4 windowcontrols."""
+    kinds = [only] if only else ["close", "maximize", "minimize"]
+    sels = []
+    for k in kinds:
+        sels += [f"headerbar button.titlebutton.{k}{state}", f".titlebar button.titlebutton.{k}{state}",
+                 f"windowcontrols button.{k}{state}"]
+    return ", ".join(sels)
+
+
 def kyber_layer(a, gtk4):
     bi = lambda n: border_image(n, gtk4)
     glow = f"0 0 6px {a}"
@@ -163,15 +173,14 @@ row:selected, treeview.view:selected, iconview:selected, flowboxchild:selected {
   background-color: alpha({a}, 0.32); color: {TEXT}; box-shadow: inset 2px 0 {a}; }}
 scrollbar slider {{ border-radius: 0; }}
 
-/* window buttons (client-side title bars): square, lit on hover, close goes red */
-headerbar button.titlebutton, .titlebar button.titlebutton, windowcontrols button {{
-  border-radius: 0; border: none; box-shadow: none; background: none; background-image: none;
+/* window buttons: square, lit on hover, close goes red. Mint-Y styles each button class
+   (.close/.maximize/.minimize, incl. :backdrop) with a radial-gradient disc, so match that. */
+{wbtn("")} {{ border-radius: 0; border: none; box-shadow: none; background: none; background-image: none;
   color: {TEXT}; min-width: 26px; min-height: 22px; padding: 0 3px; margin: 0 1px; }}
-headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover, windowcontrols button:hover {{
-  background-color: alpha({a}, 0.22); box-shadow: inset 0 0 0 1px {a}; color: {a}; }}
-headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover, windowcontrols button.close:hover {{
-  background-color: {ALERT}; box-shadow: none; color: #ffffff; }}
-headerbar button.titlebutton:backdrop, windowcontrols button:backdrop {{ color: {FAINT}; }}
+{wbtn(":backdrop")} {{ background: none; background-image: none; color: {FAINT}; }}
+{wbtn(":hover")} {{ background-image: none; background-color: alpha({a}, 0.22); box-shadow: inset 0 0 0 1px {a}; color: {a}; }}
+{wbtn(":active")} {{ background-image: none; background-color: alpha({a}, 0.4); color: #ffffff; }}
+{wbtn(":hover", "close")}, {wbtn(":active", "close")} {{ background-image: none; background-color: {ALERT}; box-shadow: none; color: #ffffff; }}
 windowcontrols button > image, headerbar button.titlebutton > image {{
   background: none; background-color: transparent; border-radius: 0; box-shadow: none; color: inherit; }}
 scrollbar slider:hover {{ background: {a}; }}
