@@ -207,4 +207,6 @@ if [ $SYSTEM = 1 ]; then
     sudo "$HERE/system/install-system.sh" "$DIST" "$CRYSTAL"
 fi
 
-say "done. Crystal: $Cap. Switch any time with: kyberos-crystal <blue|green|red|purple|yellow|white>"
+cmd=kyberos-crystal
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) cmd="~/.local/bin/kyberos-crystal" ;; esac   # not on PATH on Arch by default
+say "done. Crystal: $Cap. Switch any time with: $cmd <blue|green|red|purple|yellow|white>"
