@@ -44,6 +44,11 @@ def main():
     if not only:
         for sub in STATIC:
             shutil.copytree(ROOT / "src" / sub, out / sub, dirs_exist_ok=True)
+        # Plasma <= 6.3 KWin loads <name>_core.frag on a core-profile context and doesn't
+        # prepend a #version line itself (6.4+ does, and ignores these files)
+        for frag in (out / "kwin" / "effects").glob("*/contents/shaders/*.frag"):
+            if not frag.stem.endswith("_core"):
+                frag.with_name(frag.stem + "_core.frag").write_text("#version 140\n" + frag.read_text())
         print("  copied src/")
     for name in GENERATORS:
         if only and name not in only:

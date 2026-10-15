@@ -34,6 +34,7 @@ else
 fi
 
 rm -f "$DATA"/color-schemes/KyberOS*.colors "$DATA"/konsole/KyberOS*
+rm -f "$DATA/icons/hicolor/scalable/apps/start-here-kyberos.svg"
 rm -rf "$DATA"/aurorae/themes/KyberOS-* "$DATA"/wallpapers/KyberOS-* "$DATA"/icons/KyberOS* "$DATA/sounds/KyberOS"
 rm -rf "$DATA/plasma/desktoptheme/KyberOS" "$DATA/plasma/look-and-feel/org.kyberos.desktop" \
        "$DATA/plasma/wallpapers/org.kyberos.tactical" "$DATA/plasma/plasmoids/org.kyberos.diagnostics"

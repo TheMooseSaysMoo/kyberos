@@ -102,6 +102,9 @@ for sub in color-schemes aurorae konsole wallpapers icons sounds; do
     mkdir -p "$DATA/$sub"
     cp -r "$DIST/$sub/." "$DATA/$sub/"
 done
+# the menu button icon also goes into hicolor, the fallback every Plasma version searches
+mkdir -p "$DATA/icons/hicolor/scalable/apps"
+cp "$DIST/icons/KyberOS/scalable/apps/start-here-kyberos.svg" "$DATA/icons/hicolor/scalable/apps/"
 mkdir -p "$CONF/Kvantum"
 cp -r "$DIST/Kvantum/." "$CONF/Kvantum/"
 mkdir -p "$DATA/plasma" "$DATA/kwin/effects" "$DATA/kwin/tabbox"
