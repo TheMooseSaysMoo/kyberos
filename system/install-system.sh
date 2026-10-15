@@ -98,7 +98,9 @@ sddm)
         printf '[General]\nCrystal=%s\nAnimate=true\n' "$CRYSTAL" > /usr/share/sddm/themes/kyberos/theme.conf.user
         chmod -R a+rX /usr/share/sddm/themes/kyberos
         mkdir -p /etc/sddm.conf.d
-        printf '[Theme]\nCurrent=kyberos\nCursorTheme=KyberOS-%s\nCursorSize=24\n' "$Cap" > /etc/sddm.conf.d/50-kyberos.conf
+        # InputMethod= : Debian enables the Qt on-screen keyboard by default, which pops up over
+        # the IDENTIFY panel on focus (touchscreen users can set InputMethod=qtvirtualkeyboard)
+        printf '[General]\nInputMethod=\n\n[Theme]\nCurrent=kyberos\nCursorTheme=KyberOS-%s\nCursorSize=24\n' "$Cap" > /etc/sddm.conf.d/50-kyberos.conf
         say "SDDM themed (applies at next logout/boot; preview: sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/kyberos)"
     fi
     ;;
