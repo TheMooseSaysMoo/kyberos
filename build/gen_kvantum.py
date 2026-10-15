@@ -15,7 +15,7 @@ def frames(a):
     """element -> {state: Frame kwargs} for every framed widget."""
     fill = lambda c, o=1: (c, o)
     clear = ("#000000", 0.002)
-    btn = dict(corner=4, chamfer=3)
+    btn = dict(corner=5, chamfer=4)
     f = {}
     f["button"] = {
         "normal": dict(**btn, fill=fill(STEEL), border=BEVEL),
@@ -32,9 +32,9 @@ def frames(a):
         "disabled": dict(**btn, fill=clear),
     }
     f["lineedit"] = {
-        "normal": dict(corner=4, fill=fill(VOID), border=BEVEL),
-        "focused": dict(corner=4, fill=fill(VOID), border=a, bars={"bottom": (a, 2)}),
-        "disabled": dict(corner=4, fill=fill(VOID, 0.5), border=(BEVEL, 0.5)),
+        "normal": dict(corner=5, fill=fill(VOID), border=BEVEL),
+        "focused": dict(corner=5, fill=fill(VOID), border=a, bars={"bottom": (a, 2)}),
+        "disabled": dict(corner=5, fill=fill(VOID, 0.5), border=(BEVEL, 0.5)),
     }
     f["itemview"] = {
         "normal": dict(corner=2, fill=clear),
@@ -42,7 +42,7 @@ def frames(a):
         "pressed": dict(corner=2, fill=fill(a, 0.32), border=(a, 0.6)),
         "toggled": dict(corner=2, fill=fill(a, 0.26), border=(a, 0.5)),
     }
-    f["menu"] = {"normal": dict(corner=4, chamfer=3, fill=fill(PANEL, 0.98), border=BEVEL, diag=a)}
+    f["menu"] = {"normal": dict(corner=5, chamfer=4, fill=fill(PANEL, 0.98), border=BEVEL, diag=a)}
     for el in ("menuitem", "menubaritem"):
         f[el] = {
             "normal": dict(corner=2, fill=clear),
@@ -73,7 +73,7 @@ def frames(a):
         "toggled": dict(corner=3, fill=fill(a, 0.85), border=a),
         "disabled": dict(corner=3, fill=fill(VOID, 0.5), border=(BEVEL, 0.5)),
     }
-    tab = dict(corner=4, chamfer=3, chamfered=("topleft",))
+    tab = dict(corner=5, chamfer=4, chamfered=("topleft",))
     for el in ("tab", "floating-tab"):
         f[el] = {
             "normal": dict(**tab, fill=fill(STEEL, 0.6), border=(BEVEL, 0.8)),
@@ -82,14 +82,14 @@ def frames(a):
             "toggled": dict(**tab, fill=fill(PANEL), border=BEVEL, diag=a, bars={"top": (a, 2)}),
             "disabled": dict(**tab, fill=fill(STEEL, 0.3), border=(BEVEL, 0.4)),
         }
-    f["tabframe"] = {"normal": dict(corner=4, fill=fill(PANEL), border=BEVEL)}
-    f["group"] = {"normal": dict(corner=4, chamfer=3, fill=fill(PANEL, 0.4), border=BEVEL, diag=a)}
+    f["tabframe"] = {"normal": dict(corner=5, fill=fill(PANEL), border=BEVEL)}
+    f["group"] = {"normal": dict(corner=5, chamfer=4, fill=fill(PANEL, 0.4), border=BEVEL, diag=a)}
     f["toolbar"] = {"normal": dict(corner=2, fill=fill(PANEL))}
     f["common"] = {
-        "normal": dict(corner=4, fill=clear, border=BEVEL),
-        "focused": dict(corner=4, fill=clear, border=a),
+        "normal": dict(corner=5, fill=clear, border=BEVEL),
+        "focused": dict(corner=5, fill=clear, border=a),
     }
-    f["tooltip"] = {"normal": dict(corner=4, chamfer=3, fill=fill(VOID, 0.97), border=BEVEL, diag=a)}
+    f["tooltip"] = {"normal": dict(corner=5, chamfer=4, fill=fill(VOID, 0.97), border=BEVEL, diag=a)}
     f["splitter"] = {"normal": dict(corner=1, fill=clear)}
     return f
 
@@ -222,10 +222,10 @@ kcapacitybar_as_progressbar=true
 [PanelButtonCommand]
 frame=true
 frame.element=button
-frame.top=4
-frame.bottom=4
-frame.left=4
-frame.right=4
+frame.top=5
+frame.bottom=5
+frame.left=5
+frame.right=5
 interior=true
 interior.element=button
 indicator.size=10
@@ -473,10 +473,10 @@ inherits=PanelButtonCommand
 
 [Menu]
 inherits=PanelButtonCommand
-frame.top=4
-frame.bottom=4
-frame.left=4
-frame.right=4
+frame.top=5
+frame.bottom=5
+frame.left=5
+frame.right=5
 frame.element=menu
 interior.element=menu
 
@@ -493,10 +493,10 @@ interior=false
 
 [ToolTip]
 inherits=GenericFrame
-frame.top=4
-frame.bottom=4
-frame.left=4
-frame.right=4
+frame.top=5
+frame.bottom=5
+frame.left=5
+frame.right=5
 interior=true
 text.margin=0
 interior.element=tooltip
