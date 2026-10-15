@@ -56,3 +56,33 @@ the tokens in `build/palette.py`. Hand-written packages live in `src/`.
 - **Scenes can be built at size 0** (the multi-monitor login greeter does this). Any loop that runs "until it fills the width" never ends, eating memory until the OOM killer steps in. `Readout.qml` did this and took a three-monitor greeter to 59 GB. Every size-derived loop or count needs a guard and a cap; `main.qml` also holds the scene Loader until it has a size.
 - **Restarting `plasmalogin` straight away races** with the old greeter's compositor shutting down ("transaction is destructive"), leaving no greeter on screen. Use `systemctl stop plasmalogin; sleep 4; systemctl start plasmalogin`.
 - **A running KWin won't load newly installed effects**, even on reconfigure. Call `org.kde.kwin.Effects.loadEffect`.
+
+## Cinnamon target
+
+| Piece | Source | Notes |
+|---|---|---|
+| GTK 3/4 theme + window borders | `build/gen_gtk.py` | Vendored Mint-Y-Dark CSS (`src/cinnamon/base/mint-y`) recolored by `build/recolor.py`, plus the KyberOS layer: border-image chamfer plates, window buttons, saber progress bars, lock-screen `.csstage` styles. The metacity-1 XML is shipped, but Muffin draws server-side borders from the GTK CSS. |
+| Shell theme | `build/gen_cinnamon.py` | Mint-Y-Dark `cinnamon.css` recolored, plus KyberOS overrides (panels, menus, Alt+Tab, `.dialog`, notifications, OSD). |
+| Window animations | `src/cinnamon/extensions/kyberos-effects@kyberos` | Swaps Cinnamon's `map`/`destroy` signal handlers for wrappers that still run Cinnamon's own `_mapWindow`/`_destroyWindow` with a proxy window manager. Shaders are generated from the KWin `.frag` files (`cogl_snippet()` in `gen_cinnamon.py`). |
+| Diagnostics applet | `src/cinnamon/applets/kyberos-diagnostics@kyberos` | Reads `/proc` and `/sys`; St.DrawingArea segment bars. |
+| Wallpaper | `kyberos-wallpaper` + `src/cinnamon/backdrop/span.qml` | One spanned image, one scene per monitor (offscreen qml render), autostart watcher. |
+| Live backdrop | `kyberos-live` + `live.qml` | Opt-in. Windows are marked `_NET_WM_WINDOW_TYPE_DESKTOP` by xprop, nemo-desktop is told to ignore class `qml`, and its window is raised. |
+| Installer | `lib/install-cinnamon.sh` | gsettings/dconf, applet JSON edits (`cin_spice_set`, then `ReloadXlet`), GTK 4 links in `~/.config/gtk-4.0`. |
+| Login screen | `system/install-system.sh` (`lightdm`) | slick-greeter (single conf file, original kept) or lightdm-gtk-greeter drop-in. |
+
+### Cinnamon gotchas found while building
+- **Handler binding:** Cinnamon binds `WindowManager._mapWindow` once, so patching the method does nothing. Swap the signal handler itself (`GObject.signal_handler_find`).
+- **Hidden while mapping:** Muffin keeps a mapping window hidden until `completed_map`. An effect that delays `completed_map` must call `actor.show()` itself.
+- **GType names:** `GObject.registerClass` on anonymous classes gives them all the same GType name. Give each class a unique `GTypeName`; re-enabling registers them again.
+- **CSS caching:** Muffin caches window-border CSS per theme name for the whole session. Updating over the same theme name needs a Cinnamon restart.
+- **St and fonts:** St measures labels without `letter-spacing` and with variable fonts at regular weight, so spaced or bold button labels get ellipsized.
+- **GTK 3 `:not()`:** GTK 3 `:not()` takes a simple selector only. A compound selector breaks that rule (and logs "Theme parsing error").
+- **Qt 6.4 on Mint 22:**
+  - no `PathRectangle` (6.8) and no `preferredRendererType` (6.6);
+  - QML lists can't be iterated with `for..of`;
+  - the `qml` runtime is package `qml-qt6`, and the SVG image plugin is in `libqt6svg6` (`qt6-svg-plugins` on Debian 13);
+  - there is no Qt 6 Kvantum.
+- **Plymouth on Ubuntu/Mint:** there is no `plymouth-set-default-theme`; the theme is the `default.plymouth` alternative.
+- **Desktop-type windows:** `Qt.Desktop` windows never show. nemo-desktop refuses to start while another desktop window exists unless that window's class is in `org.nemo.desktop ignored-desktop-handlers`.
+- **Applet settings:** Cinnamon reads applet JSON settings at load. After editing them, call `org.Cinnamon.ReloadXlet`.
+- **Zombie processes:** after a `cinnamon --replace`, a zombie `cinnamon` can be the first `pgrep` match. Pick a process whose `/proc/PID/environ` is readable.
